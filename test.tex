@@ -1,6 +1,23 @@
 \documentclass{article}
 \usepackage{synttree}
 \begin{document}
+A sentence.
+\childattachsep{0.6in} 
+\childsidesep{0.9em}
+Another one.
+
+    \synttree[A[A]] % single child, no label issues
+
+    \synttree[A[ZZ]] % single child, bottom label is wider
+
+    \synttree[AA[A]] % single child, top label is wider
+
+    \synttree[A[.t ZZ]] % single child, triangle
+
     \synttree[A[a a a a a a a][D]]
-    \synttree[A[a a a a a a a[E][F]][D]]
+
+    \synttree[A[a a a a a a a[E][.t FFFFFFFF]][D[.t ZZ]]]
+    % with some triangles, slightly weird.
+
+    \synttree[A[B][C][D]] % three children
 \end{document}
