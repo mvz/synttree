@@ -1,19 +1,18 @@
-New work on the synttree package.
+      The synttree package for typesetting syntactic trees
 
-simple.tex: Simple recursive parser using a special \END delimiter. This
-parsing method can be used for any number of special characters in the
-material to be parsed. As an example, see the new and improved version of
-the pnpbook class, where mathematical material is parsed in this way.
+      Version 1.3.1
 
-balance.tex: Recursive parser without outer \END delimiter. Knowing that
-the parsed text must be balanced, we can rely on a counter to tell if we've
-encountered the end of the parsed text. This means we don't have to
-surround the text with braces in the document.
+The "synttree" package provides a simple way to typeset syntactic trees as
+used in Chomsky's Generative Grammar.
 
-tree.tex: Implementation of a tree typesetter in terms of the parsing
-method introduced in balance.tex. Also outputs some logging.
+To use the package, download synttree.dtx and synttree.ins. Then run
 
-synttree.dtx and synttree.ins: source files for synttree.sty, implementing
-the method introduced in tree.tex.
+  tex synttree.ins
 
-test.tex: Tests synttree.sty
+to generate synttree.sty. Place that file somewhere LaTeX will find it.
+
+Documentation can be found in synttree.pdf (generated from synttree.dtx).
+
+This package has been released under the terms of the Latex Project Public
+License, version 1.3a.
+Copyright (C) 1998, 2001, 2004 by Matijs van Zuijlen

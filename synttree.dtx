@@ -1,7 +1,11 @@
 %% \CheckSum{806}
 % \iffalse meta-comment
-%
-%  Copyright (c) 1998, 1999, 2001 Matijs van Zuijlen
+%% synttree.dtx 
+%% Package `synttree' for use with LaTeX 2e
+%% Version 1.3.1
+% 
+% See the section "Author and License" below for copyright and licensing
+% information 
 % 
 % \fi
 %
@@ -23,9 +27,6 @@
 %%
 %\iffalse    This is a METACOMMENT
 %
-%% Package `synttree' to use with LaTeX 2e
-%% Copyright (C) 1998 by Matijs van Zuijlen
-%
 % Version:  Date:	Changes:
 % 0.9	    1998/07/19	First version as a .dtx distibution.
 % 0.9a      ?		?
@@ -34,7 +35,7 @@
 % 1.1	    1999/10/13  More children, better code.
 % 1.2	    2001	Totally new system
 % 1.3	    2004/11/07	New system up and running.
-%	    	    	    
+% 1.3.1	    2004/11/07	Prepared for packaging, clarified licensing.
 %
 %<*driver>
 \documentclass[a4paper]{ltxdoc}
@@ -43,7 +44,7 @@
  %\DisableCrossrefs     % Say \DisableCrossrefs if index is ready
 \CodelineIndex
 \RecordChanges          % Gather update information
- %\OnlyDescription      % comment out for implementation details
+ \OnlyDescription      % comment out for implementation details
  \OldMakeindex         % use if your MakeIndex is pre-v2.9
 \setlength\hfuzz{15pt}  % dont make so many
 \hbadness=7000          % over and under full box warnings
@@ -55,9 +56,9 @@
 %\fi
 %\MakeShortVerb{\"} 
 % \title{The "synttree" package for typesetting syntactic
-% trees.\footnote{Package version 1.2}}
-% \author{Matijs van Zuijlen\footnote{e-mail:
-% \texttt{Matijs.van.Zuijlen@xs4all}}}
+% trees.\footnote{Package version 1.3.1}}
+% \author{Matijs van Zuijlen\footnote{e-mail: \texttt{mvz@xs4all}; web:
+% \texttt{http://www.matijs.net/}}}
 %
 % \maketitle
 %
@@ -89,15 +90,6 @@
 %  syntactic trees the label \emph{is} the node symbol. Additionally,
 %  the method of specifying the tree structure itself makes the source
 %  code hard to read.
-%  \iffalse This text is to be ignored.
-%
-%  The two packages that I have considered using failed on one of
-%  these two demands.  First, the "qtree" package did not keep the
-%  distance between levels constant. Second, the "???" package used
-%  PostScript for output.
-%
-%  Please send any comments or wishes to me, "Matijs.van.Zuijlen@xs4all.nl".
-%  \fi
 %
 %  \section{Usage}
 %
@@ -163,7 +155,7 @@
 %  \item \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
 % \end{trivlist}
 %
-%  \subsection{Wish List}
+%  \section{Wish List and Bugs}
 %
 % I hope to add the following features sooner or later:
 % \begin{itemize}
@@ -176,10 +168,20 @@
 %   \item Let labels ignore starting and trailing whitespace.
 % \end{itemize}
 %
-% \subsection{Bugs}
-%
+%  \section{Known Bugs}
 % Triangles on non-leaf nodes are not forbidden, but do not give the
 % desired result.
+%
+%  \section{Author and License}
+%
+% Copyright (c) 1998, 1999, 2001, 2004 Matijs van Zuijlen.
+%
+% The "synttree" package is free software. It has been released under the
+% terms of the Latex Project Public License, version 1.3a. 
+%
+% This work has the LPPL maintenance status `maintained'. Its current
+% maintainer is Matijs van Zuijlen. This work consists of the files
+% "synttree.dtx" and "synttree.ins".
 %
 % \StopEventually{
 %  \begin{thebibliography}{1}

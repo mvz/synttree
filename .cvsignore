@@ -1,7 +1,9 @@
 *.aux
 *.dvi
+*.pdf
 *.log
 *.toc
 *.glo
 *.idx
 synttree.sty
+synttree.tar.gz

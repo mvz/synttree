@@ -1,0 +1,19 @@
+New work on the synttree package.
+
+simple.tex: Simple recursive parser using a special \END delimiter. This
+parsing method can be used for any number of special characters in the
+material to be parsed. As an example, see the new and improved version of
+the pnpbook class, where mathematical material is parsed in this way.
+
+balance.tex: Recursive parser without outer \END delimiter. Knowing that
+the parsed text must be balanced, we can rely on a counter to tell if we've
+encountered the end of the parsed text. This means we don't have to
+surround the text with braces in the document.
+
+tree.tex: Implementation of a tree typesetter in terms of the parsing
+method introduced in balance.tex. Also outputs some logging.
+
+synttree.dtx and synttree.ins: source files for synttree.sty, implementing
+the method introduced in tree.tex.
+
+test.tex: Tests synttree.sty
