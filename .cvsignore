@@ -1,0 +1,7 @@
+*.aux
+*.dvi
+*.log
+*.toc
+*.glo
+*.idx
+synttree.sty

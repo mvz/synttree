@@ -1,0 +1,63 @@
+%
+% Demonstreer simpele parser zonder speciale \END delimiter.
+%
+\documentclass{article}
+\makeatletter
+\def\@AfterFi#1\fi{\fi#1}
+\def\@AfterElseFi#1\else#2\fi{\fi#1}
+%
+% Parser part. Parsing ends when \prut is 0 again.
+%
+\newcount\prut
+%
+% Vind eerstvolgende ].
+% Doorgaan wordt bepaald, niet door een \END token, maar doordat \prut weer
+% op 0 is gekomen.
+%
+\def\parserightbracket#1]{% #1 bevat geen ], maar misschien [
+    \parseleftbracket#1[:\END% Zoek naar [.
+    \advance\prut by -1%
+    % Action part
+    \dorightbracket%
+    \endgroup%
+    % End action part
+    \ifnum\prut=0%
+    \else
+        \@AfterFi{%
+            \parserightbracket%
+        }%
+    \fi%
+}
+% Vind eerste en verdere [.
+\def\parseleftbracket#1[#2\END{% #1 en #2 bevatten allebei geen ].
+    #1%
+    \ifx#2:% Deze [ is door parserightbracket beplaatst
+    \else
+        % Action part
+        \begingroup%
+	\doleftbracket%  In
+        % End action part
+        \advance\prut by 1%
+	\@AfterFi{\parseleftbracket#2\END}%
+    \fi%
+}
+%
+\def\parse{%
+    \prut=0%
+    \parserightbracket%
+}%
+%
+% Action parts
+%
+\def\doleftbracket{%
+    \{%
+}
+\def\dorightbracket{%
+    \}%
+}
+\makeatother
+\begin{document}
+    \parse[A[C][D]B]
+    
+    \parse[A]
+\end{document}

@@ -1,0 +1,60 @@
+%
+% Demonstreer simpele parser met een speciale \END delimiter.
+%
+% Idee is:
+% \def\parseerA#1A#2\END{
+%   \parseerB#1B:\END
+%   \ifx#2:
+%       (doe niets meer)
+%   \else
+%       (doe wat met A moet)
+%       \@AfterFi{\parseerA#2\END}%
+%   \fi
+% }
+% Waarbij parseerA dus parseerB roept, en parseerB weer parseerC, etc,
+% steeds met dezelfde :\END delimiters, todat er geen scheidingsteken meer
+% is.
+%
+% En dan:
+% \def\start#1{
+%   \parseerA#1A:\END
+% }
+%
+\documentclass{article}
+\makeatletter
+\def\@AfterFi#1\fi{\fi#1}
+\def\@AfterElseFi#1\else#2\fi{\fi#1}
+% Vind eerste ].
+\def\parseleftbracket#1]#2\END{% #1 bevat geen ], maar misschien [
+    \parserightbracket#1[:\END% Zoek naar [.
+    \ifx#2:% Niet meer verder parsen na afloop; ] is door \parse
+           % toegevoegd.
+    \else
+        O%
+        \@AfterFi{% Wel verder parsen.
+            \parseleftbracket#2\END%
+        }%
+    \fi%
+}
+% Vind eerste en verdere [.
+\def\parserightbracket#1[#2\END{% #1 en #2 bevatten allebei geen ].
+    #1%
+    \ifx#2:% Deze [ is door parseleftbracket toegevoegd: negeer.
+    \else
+	I%  In
+	\@AfterFi{\parserightbracket#2\END}%
+    \fi%
+}
+%
+% Maak parse commando gebruikersvriendelijk.
+%
+\def\parse#1{%
+    \parseleftbracket#1]:\END%
+}%
+\makeatother
+%
+% Demo document.
+%
+\begin{document}
+    \parse{[A[C][D]B]}
+\end{document}

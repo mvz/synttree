@@ -1,0 +1,112 @@
+\documentclass{article}
+\makeatletter
+\def\@AfterFi#1\fi{\fi#1}
+\def\@AfterElseFi#1\else#2\fi{\fi#1}
+%
+\newif\ifuselabel
+\newbox\bxlabel
+\newbox\bxci
+\newbox\bxcii
+\newbox\bxciii
+\newbox\treebox
+\newcount\numchildren
+%
+% Parser part. Parsing ends when \level is 0 again.
+%
+\newcount\level
+% Vind eerste ].
+\def\parserightbracket#1]{% #1 bevat geen ], maar misschien [
+    \parseleftbracket#1[:\END% Zoek naar [.
+    \advance\level by -1%
+    % Action part
+    \dorightbracket%
+    % End action part
+    \ifnum\level=0%
+        End\newline%
+        \unhbox\bxci%
+    \else
+        \@AfterFi{%
+            \parserightbracket%
+        }%
+    \fi%
+}
+% Vind eerste en verdere [.
+% #1 en #2 bevatten allebei geen ].
+% dus #1 is mogelijk een label.
+% als #2=:, dan is [ door \parserightbracket geplaatst.
+\def\parseleftbracket#1[#2\END{%
+    \ifuselabel%
+        Label: #1\newline%
+        \setbox\bxlabel\hbox{#1}%
+    \else
+        Ignored: #1\newline%
+    \fi%
+    \ifx#2:%
+    \else
+        \doleftbracket%
+        \advance\level by 1%
+        \@AfterFi{\parseleftbracket#2\END}%
+    \fi%
+}
+%
+\def\parse{%
+    \level=0%
+    \numchildren=0%
+    \uselabelfalse%
+    \parserightbracket%
+}%
+%
+% Action parts
+%
+\def\doleftbracket{%
+    \bgroup%
+    \numchildren=0%
+    \uselabeltrue%
+}
+\def\dorightbracket{%
+    \maketreebox%
+    \egroup%
+    \advance\numchildren by 1%
+    \uselabelfalse%
+    \savechildbox%
+}
+\def\maketreebox{%
+    \ifnum\numchildren=0%
+        \global\setbox\treebox\hbox{L\unhbox\bxlabel}
+    \fi
+    \ifnum\numchildren=1%
+        \global\setbox\treebox\hbox{%
+            \vbox{%
+                \hbox{L\unhbox\bxlabel}%
+                \hbox{\unhbox\bxci;}}}%
+    \fi
+    \ifnum\numchildren=2%
+        \global\setbox\treebox\hbox{%
+            \vbox{%
+                \hbox{L\unhbox\bxlabel}%
+                \hbox{\unhbox\bxci;\unhbox\bxcii}}}%
+    \fi
+    \ifnum\numchildren=3%
+        \global\setbox\treebox\hbox{%
+            \vbox{%
+                \hbox{L\unhbox\bxlabel}%
+                \hbox{\unhbox\bxci;\unhbox\bxcii;\unhbox\bxciii}}}%
+    \fi
+}
+\def\savechildbox{%
+    \ifnum\numchildren=0%
+        No child??\newline%
+    \else
+        \ifnum\numchildren>3%
+            Too many children!!\newline%
+        \else
+            \setbox%
+                \csname bxc\romannumeral\numchildren\endcsname%
+                \hbox{\unhbox\treebox}%
+        \fi
+    \fi
+}
+\makeatother
+\begin{document}
+    \parse[A[C[E][F]][D]]
+\end{document}
