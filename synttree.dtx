@@ -762,7 +762,8 @@
 %    \begin{macrocode}
 \def\MTr@drawchildline#1{
 %    \end{macrocode}
-% Advance child's $y$ to make the line stop just above the label.
+% Use child's $y$, but advance it to make the line stop just above the
+% label.
 %    \begin{macrocode}
   \MTr@tempcnta\MTr@childparam{#1}{y}
   \advance\MTr@tempcnta\MTr@lineoffset%
