@@ -159,13 +159,14 @@
 %
 % I hope to add the following features sooner or later:
 % \begin{itemize}
-%   \item Larger number of children. The current limit is three.
+%   \item Let labels ignore starting and trailing whitespace.
+%   \item Larger number of children. The current limit is three. Ideally,
+%   any arbitrary number of children will be supported.
 %   \item Control over other parameters affecting the `look' of the tree.
 %   \item The possibility of `sinking' the tree on the current line,
 %   so that the top label aligns with the other text, instead of the
 %   bottom label.
 %   \item The possibility of creating trees within trees.
-%   \item Let labels ignore starting and trailing whitespace.
 % \end{itemize}
 %
 %  \section{Known Bugs}
@@ -509,7 +510,8 @@
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{
   \ifx:#2
-    \setbox\MTr@labelbox\hbox{#1}
+    \setbox\MTr@labelbox\hbox{}
+    \MTr@setlabel#1 \END
   \else
     \ifx#2b\MTr@bottomnodetrue\else%
     \ifx#2x\MTr@bottomnodetrue\MTr@mytriangletrue\else%
@@ -518,6 +520,15 @@
     \fi\fi\fi%
     \MTr@parsedot#3\END
   \fi
+}
+\def\MTr@setlabel#1 #2\END{
+  \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox x#1x}
+  \ifx #2
+  \else\ifx#2\empty
+  \else
+    \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{}y y}
+    \MTr@setlabel#2\END
+  \fi\fi
 }
 %    \end{macrocode}
 % \end{macro}
