@@ -1,0 +1,42 @@
+Design of tree macro's for LaTeX
+
+We want a flexible system for creating a variety of top-down trees.
+There are several features that may be included:
+- Triangles: needed to hide unimportant/unknown structure
+- More than two branches: Although binary branching is the thing to
+do, we want to depict older versions of a theory that require or allow
+more than two branches. Any number of branches must be supported.
+- Bottom level nodes. It is not unusual to have all terminal nodes on
+the same horizontal line, which can then be read more or less as a
+normal sentence.
+- Automatic placement.
+- Movement arrows.
+- Trees-in-trees: At some point, we may want to hide structure in one
+constituent by hiding it in a triangle. However, we may want to
+highlight some internal structure, meaning that we may want to start a
+tree from somewhere in the middele of the constituent. for example, we
+may want to depict an NP as a triangle, but still depict that a
+certain part of it is an AP. So we have a triangle with (e.g.) "the AP
+apple" below it, where from AP another triangle sprouts, labeled
+"red".
+
+
+Problems:
+a. - Limited capacity in TeX
+
+Due to a., it may be adviseable to let the user supply the bottom
+level, or to fill an aux file.
+
+Implementation:
+
+Two implementations are now available:
+1. Fasttree. This is a system based on an implementation of stacks as 
+in QobiTree. It is in an advanced stage, has automatic placement of 
+Bottom nodes, and uses a LaTeX-style specification of tree stricture 
+(with \begin-\end constructs and commands). It is rather slow.
+2. XTree. This is a more TeX-like implementation, and uses TeX's 
+built-in stack mechanism. Currently, triangles are not implemented, 
+and the user has to specify the number of levels if bottom nodes are 
+to be crated. However, this system promises to be more maintainable, 
+with more sophisticated formatting, and is much faster.
+It uses a bracket syntax to specify the tree structure.
