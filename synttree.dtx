@@ -1,4 +1,4 @@
-%% \CheckSum{799}
+%% \CheckSum{806}
 % \iffalse meta-comment
 %
 %  Copyright (c) 1998, 1999, 2001 Matijs van Zuijlen
@@ -318,6 +318,14 @@
 \MTr@makechildstoreage{iii}
 %    \end{macrocode}
 %
+% \begin{macro}{\MTr@childparam}
+% We also need an easy way to retrieve each child's parameters. This way,
+% we don't have to use the "\csname" construct all the time.
+%    \begin{macrocode}
+\def\MTr@childparam#1#2{\csname MTr@child#1#2\endcsname}
+%    \end{macrocode}
+% \end{macro}
+%
 % Store info for current subtree: $v$, $w$ ($x$ and $y$ are external, thus
 % not important), height, depth, "branchmult", triangle status.
 %    \begin{macrocode}
@@ -369,7 +377,7 @@
 % \end{macro}
 %
 % \begin{macro}{\trianglebalance}Next, "\trianglebalance" will set the
-% balancing of the triangle (EXPLAIN!). Default value is $50$.
+% balancing of the triangle. Default value is $50$.
 %    \begin{macrocode}
 \newcount\MTr@trianglemultright%
 \newcount\MTr@trianglemultleft%
@@ -474,11 +482,10 @@
 % ^^A Scan after we already had one or more children: Just ignore anything
 % ^^A that is not a "[" or "]".
 % Scan until the first occurrance of "[". Argument "#1" will contain no "]"
-% or "[".
-% Vind eerste en verdere "[".
-% "#1" en "#2" bevatten allebei geen "]".
-% dus "#1" is mogelijk een label.
-% als "#2=:", dan is [ door "\MTr@parserightbracket" geplaatst.
+% or "[". "#2" may contain more "]".
+% Possibly, "#1" is a label.
+% If "#2"=":", the "[" was placed by "\MTr@parserightbracket", and we're
+% done.
 %    \begin{macrocode}
 \def\MTr@parseleftbracket#1[#2\END{%
   \ifMTr@uselabel%
@@ -493,6 +500,10 @@
     \@AfterFi{\MTr@parseleftbracket#2\END}%
   \fi%
 }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\Mtr@parsedot}
+%    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{
   \ifx:#2
     \setbox\MTr@labelbox\hbox{#1}
@@ -538,32 +549,8 @@
   \MTr@uselabelfalse%
   \MTr@savecurrentchildbox%
 }
-\def\MTr@maketreebox{%
-  \MTr@labelheight\ht\MTr@labelbox%
-  \ifnum\MTr@labelheight<\MTr@minheight\MTr@labelheight\MTr@minheight\fi%%
-  \MTr@labeldepth\dp\MTr@labelbox%
-  \MTr@labelhalfwidth\wd\MTr@labelbox%
-  \divide\MTr@labelhalfwidth 2%
-  % TODO: Maybe move \global\setbox\MTr@treebox out of the \ifnum s
-  \ifnum\MTr@numchildren=0%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}
-  \fi
-  \ifnum\MTr@numchildren=1%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputonechild}
-  \fi
-  \ifnum\MTr@numchildren=2%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputtwochildren}
-  \fi
-  \ifnum\MTr@numchildren=3%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputthreechildren}
-  \fi
-  \global\MTr@branchmult\MTr@mybranchmult%
-  \ifMTr@mytriangle%
-    \global\MTr@triangletrue%
-  \else%
-    \global\MTr@trianglefalse%
-  \fi%
-}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\MTr@savecurrentchildbox}
 % Save the current picture, with all its data, in the box and registers for
 % the next empty child. Basically, we just copy from the tree registers to
@@ -609,6 +596,17 @@
 % \begin{macro}{\MTr@bottomnodetrue}
 % The node is a bottom node. Calculate the difference between this
 % level and the bottom level as passed to "\synttree", and use this to
+% \begin{macro}{\MTr@drawchild}
+%    \begin{macrocode}
+\def\MTr@drawchild#1{%
+  \MTr@tempcnta\MTr@childparam{#1}{x}
+  \advance\MTr@tempcnta-\MTr@childparam{#1}{v}
+  \put(\MTr@tempcnta,\MTr@childparam{#1}{y}){%
+    \makebox(0,0)[tl]{%
+      \usebox{\csname MTr@child#1box\endcsname}}}%
+}
+%    \end{macrocode}
+% \end{macro}
 % determine how many levels the node has to be advanced vertically to
 % get it at the correct position. In effect, the distance between two
 % levels is multiplied by the ``branch multiplication.'' For
@@ -639,21 +637,188 @@
 %    \end{macrocode}
 % \end{macro}
 % 
-% \subsection{Creating the tree}
-% \begin{macro}{\MTr@maketree}
-% This macro is a horrible beast. It is the complete code for making
-% the actual tree. It has completely separate implementations for each
-% number of children from zero to two. It is my intention to modify
-% this to allow any number of children to be displayed. The main macro does
-% the following: It sets "\MTr@labelheight" to the height of the label,
-% making sure it is at least the minimum height. Next, it sets
-% corresponding variables for the depth and width of the label. Then, based
-% on the number of children, macros are called for setting just the label,
-% or one or two children.
+% \subsection{Utility macros for the output routines}
 %
-% \emph{Actual code removed.}
+% \begin{macro}{\MTr@setverticalchilddimens}
+% Set vertical dimensions for a given child: $y$ and "picheight".
+% ^^A TODO: Maybe we can set these while saving the child.
+%    \begin{macrocode}
+\def\MTr@setverticalchilddimens#1{%
+    \MTr@tempcnta-\MTr@branchheight%
+    \multiply\MTr@tempcnta\MTr@childparam{#1}{branchmult}%
+    \MTr@tempcntb-\MTr@tempcnta%
+    \advance\MTr@tempcntb\csname MTr@child#1depth\endcsname%
+    \advance\MTr@tempcnta-\MTr@labelheight%
+    \advance\MTr@tempcnta\csname MTr@child#1height\endcsname%
+    \csname MTr@child#1y\endcsname\MTr@tempcnta%
+    \csname MTr@pic#1height\endcsname\MTr@tempcntb%
+}
+%    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\MTr@adjustdistance}
+% Adjust the distance between two children. For the pair of
+% neighboring children, "tempcnta" is used temporarily to store what
+% amounts to the distance between the central points of the two children
+% (the left child's $w$, plus the right child's $v$).
+% If it is below the value "childattachsep", adjust values so that is equal
+% to it. "tempcnta" stores the resulting value.
+% The right child's $x$ is now set to put it in the correct position
+% w.r.t.\  the left child.
+%    \begin{macrocode}
+\def\MTr@adjustdistance#1#2{%
+  \MTr@tempcnta\MTr@childparam{#1}{w}%
+  \advance\MTr@tempcnta\MTr@childsidesep%
+  \advance\MTr@tempcnta\csname MTr@child#2v\endcsname%
+  \ifnum\MTr@tempcnta<\MTr@childattachsep%
+    \MTr@tempcnta\MTr@childattachsep%
+  \fi%
+  \csname MTr@child#2x\endcsname\MTr@childparam{#1}{x}%
+  \advance\csname MTr@child#2x\endcsname\MTr@tempcnta%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\MTr@setparentdimens}
+% Set some parameters for the parent node. Parameters are the leftmost and
+% rightmost child label.
+%    \begin{macrocode}
+\def\MTr@setparentdimens#1#2{%
+%    \end{macrocode}
+% Calculate the subtree's $v$ and $w$:
+%    \begin{macrocode}
+    \MTr@tempcnta\MTr@childparam{#2}{x}%
+    \advance \MTr@tempcnta -\MTr@childparam{#1}{x}%
+    \divide\MTr@tempcnta 2%
+    \MTr@treev\MTr@tempcnta%
+    \MTr@treew\MTr@treev%
+    \advance \MTr@treev \csname MTr@child#1x\endcsname%
+    \advance \MTr@treew \csname MTr@child#2w\endcsname%
+%    \end{macrocode}
+% Calculate "morex": The distance the (first) subtree has to be shifted to
+% the right to accomodate a large parent label size.
+%    \begin{macrocode}
+    \MTr@morex\MTr@labelhalfwidth%
+    \advance\MTr@morex-\MTr@treev%
+    \ifnum\MTr@morex<0\MTr@morex0\fi%
+%    \end{macrocode}
+% Large label sizes are also incorporated into $w$ and $x$.
+%    \begin{macrocode}
+    \ifnum\MTr@treew<\MTr@labelhalfwidth
+        \MTr@treew\MTr@labelhalfwidth
+    \fi%
+    \ifnum\MTr@treev<\MTr@labelhalfwidth
+        \MTr@treev\MTr@labelhalfwidth
+    \fi%
+%    \end{macrocode}
+% Picture width.
+%    \begin{macrocode}
+    \MTr@picwidth\MTr@treev%
+    \advance\MTr@picwidth\MTr@treew%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\MTr@setpictureparameters}
+% Set some parameters for the picture.
+%    \begin{macrocode}
+\def\MTr@setpictureparameters{%
+    \global\MTr@treedepth\MTr@picheight%
+    \advance\MTr@picheight\MTr@labelheight%
+    \global\MTr@treeheight\MTr@labelheight%
+    \MTr@parenty-\MTr@labelheight%
+    \advance\MTr@parenty-\MTr@labeldepth%
+    \advance\MTr@parenty-\MTr@lineoffset%
+    \global\MTr@treev\MTr@treev%
+    \global\MTr@treew\MTr@treew%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\MTr@drawlabel}
+%    \begin{macrocode}
+\def\MTr@drawlabel{%
+  \put(\MTr@treev,0){%
+    \makebox(0,0)[t]{%
+      \rule{0pt}{\MTr@minheight}%
+      \usebox{\MTr@labelbox}}}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\MTr@drawchild}
+% Draws the saved child node's picture.
+%    \begin{macrocode}
+\def\MTr@drawchild#1{%
+  \MTr@tempcnta\MTr@childparam{#1}{x}
+  \advance\MTr@tempcnta-\MTr@childparam{#1}{v}
+  \put(\MTr@tempcnta,\MTr@childparam{#1}{y}){%
+    \makebox(0,0)[tl]{%
+      \usebox{\csname MTr@child#1box\endcsname}}}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\MTr@drawchildline}
+% Draws the line or triangle from the parent to the given child.
+%    \begin{macrocode}
+\def\MTr@drawchildline#1{
+%    \end{macrocode}
+% Advance child's $y$ to make the line stop just above the label.
+%    \begin{macrocode}
+  \MTr@tempcnta\MTr@childparam{#1}{y}
+  \advance\MTr@tempcnta\MTr@lineoffset%
+  \csname ifMTr@child#1triangle\endcsname%
+    \MTr@tempcntb\MTr@childparam{#1}{x}%
+    \MTr@tempcntc\MTr@tempcntb%
+    \advance\MTr@tempcntb \MTr@childparam{#1}{w}%
+    \advance\MTr@tempcntc -\MTr@childparam{#1}{v}%
+    \put(0,0){\MTr@drawline%
+        (\MTr@treev,\MTr@parenty)%
+        (\MTr@tempcntc,\MTr@tempcnta)}%
+    \put(0,0){\MTr@drawline%
+        (\MTr@treev,\MTr@parenty)%
+        (\MTr@tempcntb,\MTr@tempcnta)}%
+    \put(0,0){\MTr@drawline%
+        (\MTr@tempcntc,\MTr@tempcnta)%
+        (\MTr@tempcntb,\MTr@tempcnta)}%
+  \else%
+    \put(0,0){\MTr@drawline%
+      (\MTr@treev,\MTr@parenty)%
+      (\MTr@childparam{#1}{x},\MTr@tempcnta)}%
+  \fi%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{Output routines}
+%
+% \begin{macro}{\MTr@maketreebox}
+% This is the main macro that starts the output.
+% ^^A TODO: Maybe move \global\setbox\MTr@treebox out of the \ifnum s
+%    \begin{macrocode}
+\def\MTr@maketreebox{%
+  \MTr@labelheight\ht\MTr@labelbox%
+  \ifnum\MTr@labelheight<\MTr@minheight\MTr@labelheight\MTr@minheight\fi%%
+  \MTr@labeldepth\dp\MTr@labelbox%
+  \MTr@labelhalfwidth\wd\MTr@labelbox%
+  \divide\MTr@labelhalfwidth 2%
+  \ifnum\MTr@numchildren=0%
+    \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}
+  \fi
+  \ifnum\MTr@numchildren=1%
+    \global\setbox\MTr@treebox\hbox{\MTr@outputonechild}
+  \fi
+  \ifnum\MTr@numchildren=2%
+    \global\setbox\MTr@treebox\hbox{\MTr@outputtwochildren}
+  \fi
+  \ifnum\MTr@numchildren=3%
+    \global\setbox\MTr@treebox\hbox{\MTr@outputthreechildren}
+  \fi
+  \global\MTr@branchmult\MTr@mybranchmult%
+  \ifMTr@mytriangle%
+    \global\MTr@triangletrue%
+  \else%
+    \global\MTr@trianglefalse%
+  \fi%
+}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\MTr@outputlabel}
 % Output just the label.
 %    \begin{macrocode}
@@ -701,133 +866,6 @@
 }
 %    \end{macrocode}
 % \end{macro}
-%
-% Now, the macros for output with children. First, some utilitarian macros:
-% Set $y$ and "picheight" for given child.
-% ^^A TODO: Maybe we can set these while saving the child.
-%    \begin{macrocode}
-\def\MTr@setverticalchilddimens#1{%
-    \MTr@tempcnta-\MTr@branchheight%
-    \multiply\MTr@tempcnta\MTr@childparam{#1}{branchmult}%
-    \MTr@tempcntb-\MTr@tempcnta%
-    \advance\MTr@tempcntb\csname MTr@child#1depth\endcsname%
-    \advance\MTr@tempcnta-\MTr@labelheight%
-    \advance\MTr@tempcnta\csname MTr@child#1height\endcsname%
-    \csname MTr@child#1y\endcsname\MTr@tempcnta%
-    \csname MTr@pic#1height\endcsname\MTr@tempcntb%
-}
-%    \end{macrocode}
-%
-% Adjust the distance between two children. For the pair of
-% neighboring children, "tempcnta" is used temporarily to store what
-% amounts to the distance between the central points of the two children
-% (the left child's $w$, plus the right child's $v$).
-% If it is below the value "childattachsep", adjust values so that is equal
-% to it. "tempcnta" stores the resulting value.
-% The right child's $x$ is now set to put it in the correct position
-% w.r.t.\  the left child.
-%    \begin{macrocode}
-\def\MTr@adjustdistance#1#2{%
-  \MTr@tempcnta\MTr@childparam{#1}{w}%
-  \advance\MTr@tempcnta\MTr@childsidesep%
-  \advance\MTr@tempcnta\csname MTr@child#2v\endcsname%
-  \ifnum\MTr@tempcnta<\MTr@childattachsep%
-    \MTr@tempcnta\MTr@childattachsep%
-  \fi%
-  \csname MTr@child#2x\endcsname\MTr@childparam{#1}{x}%
-  \advance\csname MTr@child#2x\endcsname\MTr@tempcnta%
-}
-%    \end{macrocode}
-% Set some parameters for the parent node. Parameters are the leftmost and
-% rightmost child label.
-%    \begin{macrocode}
-\def\MTr@setparentdimens#1#2{%
-%    \end{macrocode}
-% Calculate the subtree's $v$ and $w$:
-%    \begin{macrocode}
-    \MTr@tempcnta\MTr@childparam{#2}{x}%
-    \advance \MTr@tempcnta -\MTr@childparam{#1}{x}%
-    \divide\MTr@tempcnta 2%
-    \MTr@treev\MTr@tempcnta%
-    \MTr@treew\MTr@treev%
-    \advance \MTr@treev \csname MTr@child#1x\endcsname%
-    \advance \MTr@treew \csname MTr@child#2w\endcsname%
-%    \end{macrocode}
-% Calculate "morex": The distance the (first) subtree has to be shifted to
-% the right to accomodate a large parent label size.
-%    \begin{macrocode}
-    \MTr@morex\MTr@labelhalfwidth%
-    \advance\MTr@morex-\MTr@treev%
-    \ifnum\MTr@morex<0\MTr@morex0\fi%
-%    \end{macrocode}
-% Large label sizes are also incorporated into $w$ and $x$.
-%    \begin{macrocode}
-    \ifnum\MTr@treew<\MTr@labelhalfwidth
-        \MTr@treew\MTr@labelhalfwidth
-    \fi%
-    \ifnum\MTr@treev<\MTr@labelhalfwidth
-        \MTr@treev\MTr@labelhalfwidth
-    \fi%
-%    \end{macrocode}
-% Picture width.
-%    \begin{macrocode}
-    \MTr@picwidth\MTr@treev%
-    \advance\MTr@picwidth\MTr@treew%
-}
-%    \end{macrocode}
-% Set some parameters for the picture.
-%    \begin{macrocode}
-\def\MTr@setpictureparameters{%
-    \global\MTr@treedepth\MTr@picheight%
-    \advance\MTr@picheight\MTr@labelheight%
-    \global\MTr@treeheight\MTr@labelheight%
-    \MTr@parenty-\MTr@labelheight%
-    \advance\MTr@parenty-\MTr@labeldepth%
-    \advance\MTr@parenty-\MTr@lineoffset%
-    \global\MTr@treev\MTr@treev%
-    \global\MTr@treew\MTr@treew%
-}
-\def\MTr@drawlabel{%
-  \put(\MTr@treev,0){%
-    \makebox(0,0)[t]{%
-      \rule{0pt}{\MTr@minheight}%
-      \usebox{\MTr@labelbox}}}%
-}
-\def\MTr@childparam#1#2{\csname MTr@child#1#2\endcsname}
-\def\MTr@drawchild#1{%
-  \MTr@tempcnta\MTr@childparam{#1}{x}
-  \advance\MTr@tempcnta-\MTr@childparam{#1}{v}
-  \put(\MTr@tempcnta,\MTr@childparam{#1}{y}){%
-    \makebox(0,0)[tl]{%
-      \usebox{\csname MTr@child#1box\endcsname}}}%
-}
-\def\MTr@drawchildline#1{
-%    \end{macrocode}
-% Advance child's $y$ to make the line stop just above the label.
-%    \begin{macrocode}
-  \MTr@tempcnta\MTr@childparam{#1}{y}
-  \advance\MTr@tempcnta\MTr@lineoffset%
-  \csname ifMTr@child#1triangle\endcsname%
-    \MTr@tempcntb\MTr@childparam{#1}{x}%
-    \MTr@tempcntc\MTr@tempcntb%
-    \advance\MTr@tempcntb \MTr@childparam{#1}{w}%
-    \advance\MTr@tempcntc -\MTr@childparam{#1}{v}%
-    \put(0,0){\MTr@drawline%
-        (\MTr@treev,\MTr@parenty)%
-        (\MTr@tempcntc,\MTr@tempcnta)}%
-    \put(0,0){\MTr@drawline%
-        (\MTr@treev,\MTr@parenty)%
-        (\MTr@tempcntb,\MTr@tempcnta)}%
-    \put(0,0){\MTr@drawline%
-        (\MTr@tempcntc,\MTr@tempcnta)%
-        (\MTr@tempcntb,\MTr@tempcnta)}%
-  \else%
-    \put(0,0){\MTr@drawline%
-      (\MTr@treev,\MTr@parenty)%
-      (\MTr@childparam{#1}{x},\MTr@tempcnta)}%
-  \fi%
-}
-%    \end{macrocode}
 % \begin{macro}{\MTr@outputonechild}
 % Output label and one child.
 %    \begin{macrocode}
