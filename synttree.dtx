@@ -1,4 +1,4 @@
-%% \CheckSum{742}
+%% \CheckSum{763}
 % \iffalse meta-comment
 %
 %  Copyright (c) 1998 Matijs van Zuijlen
@@ -32,7 +32,7 @@
 %\fi
 %\MakeShortVerb{\"} 
 % \title{The "synttree" package for typesetting syntactic
-% trees.\footnote{Package version 0.9, documentation version 0.1}}
+% trees.\footnote{Package version 0.9a, documentation version 0.1a}}
 % \author{Matijs van Zuijlen}
 %
 % \maketitle
@@ -53,19 +53,18 @@
 %  It is designed to create a tree that looks nice, with as little use
 %  of `special effects', such as PostScript, as possible.
 %
-%  In fact, the
-%  current implementation uses emTeX "\special"'s, but it should not
-%  be hard to use \LaTeXe{}'s spline macro's instead, although this is
-%  probably not very nice.
+%  The current implementation can use either emTeX "\special"'s or
+%  \LaTeXe{}'s "\qbezier" macro to draw the lines in the tree,
+%  although the latter option is probably not very nice. The behavior
+%  defaults to the \LaTeXe{} version.
 %
-%  Since the
-%  application is very specific, there is no need for a very complex
-%  drawing algorithm. A more complex package is the TreeTeX system
-%  \cite{TreeTeX}. This system, however, produces nodes consisting of
-%  a node symbol \emph{and} a label, whereas in syntactic trees the
-%  label \emph{is} the node symbol. Additionally, the method of
-%  specifying the tree structure itself makes the source code hard to
-%  read.
+%  Since the application is very specific, there is no need for a very
+%  complex drawing algorithm. A more complex package is the TreeTeX
+%  system \cite{TreeTeX}. This system, however, produces nodes
+%  consisting of a node symbol \emph{and} a label, whereas in
+%  syntactic trees the label \emph{is} the node symbol. Additionally,
+%  the method of specifying the tree structure itself makes the source
+%  code hard to read.
 %  \iffalse This text is to be ignored.
 %
 %  The two packages that I have considered using failed on one of
@@ -79,11 +78,24 @@
 %
 %  \section{Usage}
 %
-%  The single macro that is currently defined by this package is the
-%  "\synttree" macro. It takes as arguments first an optional
-%  parameter indicating the maximum level of the tree, and second a
-%  parameter describing the structure of the tree. Levels are
-%  surrounded by "[" and "]".
+%  \subsection{Package Options}a
+%
+%  The following options are supported"
+%
+%  \begin{description}
+%
+%  \item[specials] Use em\TeX{} special commands.
+%  \item[nospecials] Don't use em\TeX{} special commands. This is the
+%  default.
+%
+%  \end{description}
+%
+%  \subsection{Defined Macros}
+%
+%  The main macro defined by this package is the "\synttree" macro. It
+%  takes as arguments first an optional parameter indicating the
+%  maximum level of the tree, and second a parameter describing the
+%  structure of the tree. Levels are surrounded by "[" and "]".
 %
 %  Within a level, first, parameters may be added. These are specified
 %  by appending a "." to the opening bracket, and appending letters
@@ -91,7 +103,8 @@
 %  create a triangle instead of a line going from the label to the
 %  level above it, and a "b" to specify that the node has to appear at
 %  the bottom of the tree, on a line with the outermost branches. To
-%  use "b", a maximum tree depth has to be specified.
+%  use "b", a maximum tree depth has to be specified. To combine the
+%  two features, use "x".
 %
 %  Then, the label: the label has to be separated from the brackets by
 %  spaces. After the label, the node's children follow. The are of
@@ -99,6 +112,10 @@
 %  each other or the level's ending bracket by spaces. The only spaces
 %  that are allowed are the ones surrounding the words of the labels.
 %  No words may appear between the children.
+%
+%  The distance between levels can be adjusted by using
+%  "\branchheight". It takes a length as its argument, and sets the
+%  distance to that length. Default is half an inch.
 %
 %  \subsection{Examples}
 %
@@ -131,7 +148,6 @@
 %   so that the top label aligns with the other text, instead of the
 %   bottom label.
 %   \item The possibility of creating trees within trees.
-%   \item The option of not using "\special"'s.
 % \end{itemize}
 %
 %  \StopEventually{
@@ -163,10 +179,12 @@
 %</driver>
 %    \end{macrocode}
 %
-% \subsection{Drawing specials}
+% \subsection{Drawing commands}
 %
-% These command are used to draw the lines between the nodes. This is
+% These command are used to draw the lines between the nodes. There are two
+% versions: one that uses the \LaTeXe{} "\qbezier" command, and one that is
 % an adaptation of the unsupported "eepic" package, and uses specials.
+% Currently, the package just uses the \LaTeXe{} version.
 %
 %    \begin{macrocode}
 \newcount\MTr@tempcnta
@@ -181,7 +199,16 @@
 % The line drawing macro itself. Simply draws a line between the two
 % points given. Arguments are counters.
 %    \begin{macrocode}
-\def\MTr@drawline(#1,#2)(#3,#4){%
+\def\MTr@latexdrawline(#1,#2)(#3,#4){%
+    \MTr@tempcnta=#1
+    \advance\MTr@tempcnta #3
+    \divide\MTr@tempcnta 2
+    \MTr@tempcntb=#2
+    \advance\MTr@tempcntb #4
+    \divide\MTr@tempcntb 2
+    \qbezier(#1,#2)(\MTr@tempcnta,\MTr@tempcntb)(#3,#4)%
+}
+\def\MTr@etexdrawline(#1,#2)(#3,#4){%
   \MTr@linewidthspecial%
   \MTr@tempcnta=#1\relax
   \advance \MTr@tempcnta 2368 \divide \MTr@tempcnta 4736
@@ -196,6 +223,14 @@
   \special{fp}%
   \ignorespaces
 }
+\DeclareOption{specials}{
+\let\MTr@drawline=\MTr@latexdrawline%
+}
+\DeclareOption{nospecials}{
+\let\MTr@drawline\MTr@etexdrawline%
+}
+\ExecuteOptions{nospecials}%
+\ProcessOptions%
 %    \end{macrocode}
 % Insert the actual special command for setting the line width:
 %    \begin{macrocode}
@@ -285,17 +320,29 @@
 \newlength{\MTr@templength}
 %    \end{macrocode}
 %
+% \subsection{Adjustable and other parameters}
+% The user can set up several parameters. First,%
+% \begin{macro}{\branchheight} "\branchheight" will set the distance
+% between levels.
+%    \begin{macrocode}
+\def\branchheight#1{
+  \setlength{\MTr@templength}{#1}%
+  \MTr@branchheight\MTr@templength%
+}
+%    \end{macrocode}
+% Default value is half an inch.
+%    \begin{macrocode}
+\branchheight{0.5in}
+%    \end{macrocode}
+% \end{macro}
+%
 % \subsection{Main macro}
 % \begin{macro}{\synttree}
 % "\synttree" is the main macro.
 %    \begin{macrocode}
 \def\synttree{%
 %    \end{macrocode}
-% Adjust some values to my needs: Distance between levels.
-%    \begin{macrocode}
-  \setlength{\MTr@templength}{0.5in}%
-  \MTr@branchheight\MTr@templength%
-%    \end{macrocode}
+% Adjust some values to my needs:
 % Distance between the labels and the lines.
 %    \begin{macrocode}
   \setlength{\MTr@templength}{2pt}%
@@ -310,7 +357,7 @@
   \settowidth{\MTr@templength}{ }%
   \MTr@childsidesep\MTr@templength%
 %    \end{macrocode}
-% Minimum separation between attechment of lines to child labels.
+% Minimum separation between attachment of lines to child labels.
 %    \begin{macrocode}
   \MTr@childattachsep\MTr@branchheight%
   \MTr@linesep 0%
@@ -418,8 +465,9 @@
 % \subsection{Going In}
 %
 % \begin{macro}{\MTr@goin}
-% Eat the "[" here, start a child box, start a group so everything
-% inside the child is local again, and start the child.
+% Upon encountering a "[", we go one level deeper: We skip the "[",
+% start a child box, start a group so everything inside the child is
+% local again, and start the child.
 %    \begin{macrocode}
 \def\MTr@goin[{%
   \advance\MTr@numchildren 1%
@@ -430,8 +478,9 @@
 % \end{macro}
 %
 % \begin{macro}{\MTr@startlevel}
-% In a whole new world now: We begin (again) by setting the number of
-% children to 0, and then reading any parameters for this level.
+% We're in a whole new world now: We begin (again) by setting the
+% number of children to 0, and then reading any parameters for this
+% level.
 %    \begin{macrocode}
 \def\MTr@startlevel{%
   \MTr@numchildren 0%
@@ -451,12 +500,11 @@
   \MTr@bottomnodefalse%
   \MTr@mytrianglefalse%
   \ifx#1b\MTr@bottomnodetrue\else%
-  \ifx#1{bt}\MTr@bottomnodetrue\MTr@mytriangletrue\else%
-  \ifx#1{tb}\MTr@bottomnodetrue\MTr@mytriangletrue\else%
+  \ifx#1x\MTr@bottomnodetrue\MTr@mytriangletrue\else%
   \ifx#1t\MTr@mytriangletrue\else%
   \ifx#1n\relax\else%
   \typeout{MyTree Warning: unknown option #1 in tree}%
-  \fi\fi\fi\fi\fi%
+  \fi\fi\fi\fi%
   \begin{lrbox}{\MTr@labelbox}%
   \MTr@scanin}
 %    \end{macrocode}
@@ -501,8 +549,9 @@
 %
 % \subsection{Going Out}
 % \begin{macro}{\MTr@goout}
-% We are at the end of the level. The scan function already saved
-% everything, so now , we have to make the actual tree for this level.
+% Upon encountering a "]", we are at the end of the level. The scan
+% function already saved everything, so now we have to make the actual
+% tree for this level.
 %
 %    \begin{macrocode}
 \def\MTr@goout]{%
