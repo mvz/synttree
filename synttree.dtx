@@ -1,4 +1,4 @@
-%% \CheckSum{763}
+%% \CheckSum{824}
 % \iffalse meta-comment
 %
 %  Copyright (c) 1998 Matijs van Zuijlen
@@ -28,11 +28,13 @@
 %
 % Version:     Date:     Changes:
 % 1.0        1998/07/19  First version as a .dtx distibution.
+% 1.0a       1999/10/02  Bugfix: bt combination changed to x.
+% 1.1        1999/10/13  More children, better code.
 %
 %\fi
 %\MakeShortVerb{\"} 
 % \title{The "synttree" package for typesetting syntactic
-% trees.\footnote{Package version 0.9a, documentation version 0.1a}}
+% trees.\footnote{Package version 1.1, documentation version 0.9}}
 % \author{Matijs van Zuijlen}
 %
 % \maketitle
@@ -53,7 +55,7 @@
 %  It is designed to create a tree that looks nice, with as little use
 %  of `special effects', such as PostScript, as possible.
 %
-%  The current implementation can use either emTeX "\special"'s or
+%  The current implementation can use either em\TeX "\special"'s or
 %  \LaTeXe{}'s "\qbezier" macro to draw the lines in the tree,
 %  although the latter option is probably not very nice. The behavior
 %  defaults to the \LaTeXe{} version.
@@ -78,9 +80,9 @@
 %
 %  \section{Usage}
 %
-%  \subsection{Package Options}a
+%  \subsection{Package Options}
 %
-%  The following options are supported"
+%  The following options are supported:
 %
 %  \begin{description}
 %
@@ -106,44 +108,46 @@
 %  use "b", a maximum tree depth has to be specified. To combine the
 %  two features, use "x".
 %
-%  Then, the label: the label has to be separated from the brackets by
-%  spaces. After the label, the node's children follow. The are of
-%  course surrounde by brackets. They must not be separated from
-%  each other or the level's ending bracket by spaces. The only spaces
-%  that are allowed are the ones surrounding the words of the labels.
-%  No words may appear between the children.
+%  Then, the label follows. If spaces are included in the label, surround
+%  them (or the entire label) by braces, or use "~". After the label, the
+%  node's children follow. They are of course surrounded by brackets. No
+%  words may appear between the children.
 %
 %  The distance between levels can be adjusted by using
 %  "\branchheight". It takes a length as its argument, and sets the
 %  distance to that length. Default is half an inch.
 %
+%  The balancing of the triangles can be adjusted by using
+%  "\trianglebalance". It takes a number from 0 to 100, indicating the
+%  percentage of the triangle on the right side of its attachment point to
+%  the parent.
+%
 %  \subsection{Examples}
 %
 %  As a simple example, the line
 %\begin{verbatim}
-%  \synttree[ A [ B ][ C ]]
+%  \synttree[A[B][C]]
 %\end{verbatim}
 %  creates the following tree:
 % \begin{trivlist}
-%  \item \synttree[ A [ B ][ C ]]
+%  \item \synttree[A[B][C]]
 % \end{trivlist}
 %
 % Using the optional parameters, we may specify
 %\begin{verbatim}
-%  \synttree{4}[ A [ B [.b C ]][ D [ E ][ F [.t G ]]]]
+%  \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
 %\end{verbatim}%
 %  to create:
 % \begin{trivlist}
-%  \item \synttree{4}[ A [ B [.b C ]][ D [ E ][ F [.t G ]]]]
+%  \item \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
 % \end{trivlist}
 %
 %  \subsection{Wish List}
 %
 % I hope to add the following features sooner or later:
 % \begin{itemize}
-%   \item Unlimited number of children. The current limit is two.
-%   \item Control over various parameters affecting the `look' of the
-%   tree, such as distance between levels.
+%   \item Larger number of children. The current limit is three.
+%   \item Control over other parameters affecting the `look' of the tree.
 %   \item The possibility of `sinking' the tree on the current line,
 %   so that the top label aligns with the other text, instead of the
 %   bottom label.
@@ -187,8 +191,8 @@
 % Currently, the package just uses the \LaTeXe{} version.
 %
 %    \begin{macrocode}
-\newcount\MTr@tempcnta
-\newcount\MTr@tempcntb
+\newcount\MTr@templinecnta
+\newcount\MTr@templinecntb
 %    \end{macrocode}
 % "\MTr@linewidth" stores the width of a line, using correct units for
 % the specials.
@@ -200,34 +204,34 @@
 % points given. Arguments are counters.
 %    \begin{macrocode}
 \def\MTr@latexdrawline(#1,#2)(#3,#4){%
-    \MTr@tempcnta=#1
-    \advance\MTr@tempcnta #3
-    \divide\MTr@tempcnta 2
-    \MTr@tempcntb=#2
-    \advance\MTr@tempcntb #4
-    \divide\MTr@tempcntb 2
-    \qbezier(#1,#2)(\MTr@tempcnta,\MTr@tempcntb)(#3,#4)%
+    \MTr@templinecnta=#1
+    \advance\MTr@templinecnta #3
+    \divide\MTr@templinecnta 2
+    \MTr@templinecntb=#2
+    \advance\MTr@templinecntb #4
+    \divide\MTr@templinecntb 2
+    \qbezier(#1,#2)(\MTr@templinecnta,\MTr@templinecntb)(#3,#4)%
 }
 \def\MTr@etexdrawline(#1,#2)(#3,#4){%
   \MTr@linewidthspecial%
-  \MTr@tempcnta=#1\relax
-  \advance \MTr@tempcnta 2368 \divide \MTr@tempcnta 4736
-  \MTr@tempcntb=-#2\relax
-  \advance \MTr@tempcntb -2368 \divide \MTr@tempcntb 4736
-  \MTr@linespecial{\the\MTr@tempcnta}{\the\MTr@tempcntb}%
-  \MTr@tempcnta=#3\relax
-  \advance \MTr@tempcnta 2368 \divide \MTr@tempcnta 4736
-  \MTr@tempcntb=-#4\relax
-  \advance \MTr@tempcntb -2368 \divide \MTr@tempcntb 4736
-  \MTr@linespecial{\the\MTr@tempcnta}{\the\MTr@tempcntb}%
+  \MTr@templinecnta=#1\relax
+  \advance \MTr@templinecnta 2368 \divide \MTr@templinecnta 4736
+  \MTr@templinecntb=-#2\relax
+  \advance \MTr@templinecntb -2368 \divide \MTr@templinecntb 4736
+  \MTr@linespecial{\the\MTr@templinecnta}{\the\MTr@templinecntb}%
+  \MTr@templinecnta=#3\relax
+  \advance \MTr@templinecnta 2368 \divide \MTr@templinecnta 4736
+  \MTr@templinecntb=-#4\relax
+  \advance \MTr@templinecntb -2368 \divide \MTr@templinecntb 4736
+  \MTr@linespecial{\the\MTr@templinecnta}{\the\MTr@templinecntb}%
   \special{fp}%
   \ignorespaces
 }
 \DeclareOption{specials}{
-\let\MTr@drawline=\MTr@latexdrawline%
+  \let\MTr@drawline\MTr@etexdrawline%
 }
 \DeclareOption{nospecials}{
-\let\MTr@drawline\MTr@etexdrawline%
+  \let\MTr@drawline\MTr@latexdrawline%
 }
 \ExecuteOptions{nospecials}%
 \ProcessOptions%
@@ -247,7 +251,10 @@
 %
 %   \subsection{Definitions}
 %
-%  Some counters etc.\ are defined.
+%  Some counters etc.\ are defined: The current level, the maximum depth
+%  specified, the number of children the current node has, the current
+%  "branchmult", whether the current node should be typeset with a
+%  triangle.
 %
 %    \begin{macrocode}
 \newcount\MTr@level
@@ -255,112 +262,146 @@
 \newcount\MTr@numchildren
 \newcount\MTr@mybranchmult
 \newif\ifMTr@mytriangle
+%    \end{macrocode}
+% Two "savebox"es, one for the label, one to put the child in while it is
+% being defined, and a token register, to put the label in before it is
+% ready.
+%    \begin{macrocode}
 \newsavebox{\MTr@labelbox}
 \newsavebox{\MTr@childbox}
+\newtoks\MTr@savetoks
 %    \end{macrocode}
-% Store info for child number one.
+% Store info for children: Central point is the label's atachment
+% point to the line to its parent. Drawing a box around the whole child
+% tree, we find the distance from the right side to the central point, $x$,
+% the distance from the left side, $w$, the distance from the parent node,
+% $y$. Finally, we have the height (equal to the height of the label), and
+% the depth (the height of the box minus the height of the label). Usually,
+% a child node is typeset one level below its parent. However, we may set
+% it lower, e.g., to set the child on the bottom level. "branchmult"
+% indicates how many levels below the parent the child should be typeset.
 %    \begin{macrocode}
-\newsavebox{\MTr@childonebox}
-\newcount\MTr@childonex
-\newcount\MTr@childoney
-\newcount\MTr@childonew
-\newcount\MTr@childoneheight
-\newcount\MTr@childonedepth
-\newcount\MTr@childonebranchmult
-\newif\ifMTr@childonetriangle
+\def\MTr@makechildcounter#1{
+    \expandafter\newcount\csname MTr@child#1\endcsname%
+}
+\def\MTr@makechildstoreage#1{
+    \expandafter\newsavebox\csname MTr@child#1box\endcsname%
+    \MTr@makechildcounter{#1x}
+    \MTr@makechildcounter{#1y}
+    \MTr@makechildcounter{#1w}
+    \MTr@makechildcounter{#1height}
+    \MTr@makechildcounter{#1depth}
+    \MTr@makechildcounter{#1branchmult}
+    \expandafter\newif\csname ifMTr@child#1triangle\endcsname%
+}
+\MTr@makechildstoreage{one}
+\MTr@makechildstoreage{two}
+\MTr@makechildstoreage{three}
 %    \end{macrocode}
-% Store info for child number two.
-%    \begin{macrocode}
-\newsavebox{\MTr@childtwobox}
-\newcount\MTr@childtwox
-\newcount\MTr@childtwoy
-\newcount\MTr@childtwow
-\newcount\MTr@childtwoheight
-\newcount\MTr@childtwodepth
-\newcount\MTr@childtwobranchmult
-\newif\ifMTr@childtwotriangle
 %
+% Store info for current subtree: $x$, $w$ ($y$ is not important), height,
+% depth, "branchmult", triangle status.
+%    \begin{macrocode}
 \newcount\MTr@treex
 \newcount\MTr@treew
-\newcount\MTr@treedepth
 \newcount\MTr@treeheight
-
+\newcount\MTr@treedepth
+\newcount\MTr@branchmult
+\newif\ifMTr@triangle
+%    \end{macrocode}
+% Next, the depth, height and half the width of the label.
+%    \begin{macrocode}
 \newcount\MTr@labeldepth
 \newcount\MTr@labelheight
 \newcount\MTr@labelhalfwidth
-
+%    \end{macrocode}
+% When drawing, we need "morex", to store extra shift to the right when
+% drawing the children, and "parenty", the vertical position of the point
+% where the line from the parent to the child starts. Also, we need the
+% width and height of the picture being drawn, and of each of the child
+% pictures.
+%    \begin{macrocode}
 \newcount\MTr@morex
-
 \newcount\MTr@parenty
-
-\newlength{\MTr@minheight}
-
-\newcount\MTr@branchheight
-\newcount\MTr@branchmult
-
-\newif\ifMTr@triangle
-
-\newcount\MTr@lineoffset
-%    \end{macrocode}
-% How far apart are the left and right sides of two children?
-%    \begin{macrocode}
-\newcount\MTr@childsidesep
-%    \end{macrocode}
-% How far apart are two lines?
-%    \begin{macrocode}
-\newcount\MTr@linesep
-%    \end{macrocode}
-% How far apart are the attachment points of two children?
-%    \begin{macrocode}
-\newcount\MTr@childattachsep
 \newcount\MTr@picwidth
 \newcount\MTr@picheight
 \newcount\MTr@piconeheight
 \newcount\MTr@pictwoheight
+\newcount\MTr@picthreeheight
+%    \end{macrocode}
+% Finally, we need a temporary length, and two temporary counters.
+%    \begin{macrocode}
 \newlength{\MTr@templength}
+\newcount\MTr@tempcnta
+\newcount\MTr@tempcntb
 %    \end{macrocode}
 %
 % \subsection{Adjustable and other parameters}
 % The user can set up several parameters. First,%
 % \begin{macro}{\branchheight} "\branchheight" will set the distance
-% between levels.
+% between levels. Default value is half an inch.
 %    \begin{macrocode}
-\def\branchheight#1{
+\newcount\MTr@branchheight%
+\newcommand{\branchheight}[1]{%
   \setlength{\MTr@templength}{#1}%
   \MTr@branchheight\MTr@templength%
 }
-%    \end{macrocode}
-% Default value is half an inch.
-%    \begin{macrocode}
-\branchheight{0.5in}
+\branchheight{.5in}%
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\trianglebalance}Next, "\trianglebalance" will set the
+% balancing of the triangle (EXPLAIN!). Default value is $50$.
+%    \begin{macrocode}
+\newcount\MTr@trianglemultright%
+\newcount\MTr@trianglemultleft%
+\newcommand{\trianglebalance}[1]{%
+  \MTr@trianglemultleft100%
+  \MTr@trianglemultright#1%
+  \advance\MTr@trianglemultleft-#1%
+}
+\trianglebalance{50}%
+%    \end{macrocode}
+% \end{macro}
+% Distance between the labels and the lines.
+%    \begin{macrocode}
+\newcount\MTr@lineoffset
+\setlength{\MTr@templength}{2pt}%
+\MTr@lineoffset\MTr@templength%
+%    \end{macrocode}
+% Minimum label height.
+%    \begin{macrocode}
+\newlength{\MTr@minheight}
+\setlength{\MTr@minheight}{8pt}%
+%    \end{macrocode}
+% \begin{macro}{\childsidesep} Minimum seperation between edges of two
+% children.
+%    \begin{macrocode}
+\newcount\MTr@childsidesep
+\newcommand{\childsidesep}[1]{
+    \setlength{\MTr@templength}{#1}%
+    \MTr@childsidesep\MTr@templength%
+}
+\childsidesep{1em}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\childattachsep}How far apart are the attachment points of
+% two children?
+%    \begin{macrocode}
+\newcount\MTr@childattachsep
+\newcommand{\childattachsep}[1]{
+    \setlength{\MTr@templength}{#1}%
+    \MTr@childattachsep\MTr@templength%
+}
+\childattachsep{0.5in}
+%    \end{macrocode}
+% \end{macro}
+% 
 % \subsection{Main macro}
 % \begin{macro}{\synttree}
 % "\synttree" is the main macro.
 %    \begin{macrocode}
 \def\synttree{%
-%    \end{macrocode}
-% Adjust some values to my needs:
-% Distance between the labels and the lines.
-%    \begin{macrocode}
-  \setlength{\MTr@templength}{2pt}%
-  \MTr@lineoffset\MTr@templength%
-%    \end{macrocode}
-% Minimum label height.
-%    \begin{macrocode}
-  \setlength{\MTr@minheight}{8pt}%
-%    \end{macrocode}
-% Minimum seperation between edges of children.
-%    \begin{macrocode}
-  \settowidth{\MTr@templength}{ }%
-  \MTr@childsidesep\MTr@templength%
-%    \end{macrocode}
-% Minimum separation between attachment of lines to child labels.
-%    \begin{macrocode}
-  \MTr@childattachsep\MTr@branchheight%
-  \MTr@linesep 0%
 %    \end{macrocode}
 % Measure "picture" coordinates in minimal units.
 %    \begin{macrocode}
@@ -370,7 +411,7 @@
 % will be no messages concerning depth, except when the bottomlevel
 % modifier is used.
 %    \begin{macrocode}
-  \@ifnextchar[{\MTr@synt@tree{0}}{\MTr@synt@tree}%
+  \@ifnextchar[{\MTr@synt@tree{0}}{\MTr@synt@tree}%]
 }
 %    \end{macrocode}
 % \end{macro}
@@ -437,6 +478,7 @@
     \relax\MTr@maybegrabtoken}}}
 %    \end{macrocode}
 % \end{macro}
+%
 % \begin{macro}{\MTr@scanin}
 % Scan upon entering a level: Use "\MTr@grabtoken" to scan the label.
 %    \begin{macrocode}
@@ -454,10 +496,11 @@
 % \begin{macro}{\MTr@grabtoken}
 % While we are processing tokens for storage, we know that
 % "\MTr@maybegrabtoken", used in "\MTr@scan", will be equal to
-% "\MTr@grabtoken".
+% "\MTr@grabtoken", as defined here.
 %    \begin{macrocode}
-\def\MTr@grabtoken#1 {%
-    {#1 }%
+\def\MTr@grabtoken#1{%
+    \edef\MTr@tempdef{\the\MTr@savetoks}%
+    \MTr@savetoks=\expandafter{\MTr@tempdef#1}%
     \relax\MTr@scan}
 %    \end{macrocode}
 % \end{macro}
@@ -503,9 +546,10 @@
   \ifx#1x\MTr@bottomnodetrue\MTr@mytriangletrue\else%
   \ifx#1t\MTr@mytriangletrue\else%
   \ifx#1n\relax\else%
-  \typeout{MyTree Warning: unknown option #1 in tree}%
+  \typeout{synttree Warning: unknown option #1 in tree}%
   \fi\fi\fi\fi%
   \begin{lrbox}{\MTr@labelbox}%
+  \MTr@savetoks={}%
   \MTr@scanin}
 %    \end{macrocode}
 % \end{macro}
@@ -529,7 +573,7 @@
   \advance\MTr@branchmult-\MTr@level%
   \advance\MTr@branchmult 1%
   \ifnum\MTr@branchmult<0%
-    \typeout{XTree Warning: Tree has more levels than indicated.}%
+    \typeout{synttree Warning: Tree has more levels than indicated.}%
     \typeout{>> Indicated: \the\MTr@maxdepth.}%
     \typeout{>> Level now: \the\MTr@level.}%
     \typeout{>> Mult now: \the\MTr@branchmult.}%
@@ -580,50 +624,40 @@
 % Here are the macros for actually storing the children in the child
 % boxes. For each child, store the tree itself, its $x$ position, its
 % width, height and depth, its branch multiplication and whether or
-% not it is a triangle.
+% not it is a triangle. We use a generic save routine to save the children.
 %    \begin{macrocode}
-\def\MTr@saveone{%
-  \sbox{\MTr@childonebox}{\usebox{\MTr@childbox}}%
-  \MTr@childonex\MTr@treex%
-  \MTr@childonew\MTr@treew%
-  \MTr@childoneheight\MTr@treeheight%
-  \MTr@childonedepth\MTr@treedepth%
-  \MTr@childonebranchmult\MTr@branchmult%
+\def\MTr@save#1{%
+  \sbox{\csname MTr@child#1box\endcsname}{\usebox{\MTr@childbox}}%
+  \csname MTr@child#1x\endcsname\MTr@treex%
+  \csname MTr@child#1w\endcsname\MTr@treew%
+  \csname MTr@child#1height\endcsname\MTr@treeheight%
+  \csname MTr@child#1depth\endcsname\MTr@treedepth%
+  \csname MTr@child#1branchmult\endcsname\MTr@branchmult%
   \ifMTr@triangle%
-    \MTr@childonetriangletrue%
+    \csname MTr@child#1triangletrue\endcsname%
   \else%
-    \MTr@childonetrianglefalse%
-  \fi}
-%    \end{macrocode}
-% Save child number two.
-%    \begin{macrocode}
-\def\MTr@savetwo{%
-  \sbox{\MTr@childtwobox}{\usebox{\MTr@childbox}}%
-  \MTr@childtwox\MTr@treex%
-  \MTr@childtwow\MTr@treew%
-  \MTr@childtwoheight\MTr@treeheight%
-  \MTr@childtwodepth\MTr@treedepth%
-  \MTr@childtwobranchmult\MTr@branchmult%
-  \ifMTr@triangle%
-    \MTr@childtwotriangletrue%
-  \else%
-    \MTr@childtwotrianglefalse%
+    \csname MTr@child#1trianglefalse\endcsname%
   \fi}
 %    \end{macrocode}
 % Save any child.
 %    \begin{macrocode}
 \def\MTr@savelabelorchild{%
-  \end{lrbox}%
   \ifnum\MTr@numchildren=0
-    \relax%
+    \the\MTr@savetoks%
+    \end{lrbox}%
   \else
+    \end{lrbox}%
     \ifnum\MTr@numchildren=1
-      \MTr@saveone%
+      \MTr@save{one}%
     \else
       \ifnum\MTr@numchildren=2
-        \MTr@savetwo%
+        \MTr@save{two}%
       \else
-        \typeout{MyTree Error: Trying to save third child.}%
+        \ifnum\MTr@numchildren=3
+          \MTr@save{three}%
+        \else
+          \typeout{synttree Error: Trying to save fourth child.}%
+        \fi
       \fi
     \fi
   \fi
@@ -634,7 +668,12 @@
 % This macro is a horrible beast. It is the complete code for making
 % the actual tree. It has completely separate implementations for each
 % number of children from zero to two. It is my intention to modify
-% this to allow any number of children to be displayed.
+% this to allow any number of children to be displayed. The main macro does
+% the following: It sets "\MTr@labelheight" to the height of the label,
+% making sure it is at least the minimum height. Next, it sets
+% corresponding variables for the depth and width of the label. Then, based
+% on the number of children, macros are called for setting just the label,
+% or one or two children.
 %    \begin{macrocode}
 \def\MTr@maketree{%
   \MTr@labelheight\ht\MTr@labelbox%
@@ -644,19 +683,16 @@
   \divide\MTr@labelhalfwidth 2%
   \ifnum\MTr@numchildren=0%
     \MTr@outputlabel%
-  \fi%%
+  \fi%
   \ifnum\MTr@numchildren=1%
     \MTr@outputonechild%
-  \fi%%
-%    \end{macrocode}
-% Two children
-%    \begin{macrocode}
-  \ifnum\MTr@numchildren>1%
+  \fi%
+  \ifnum\MTr@numchildren=2%
     \MTr@outputtwochildren%
   \fi%%
   \ifnum\MTr@numchildren>2%
-    \relax%
-  \fi%%
+    \MTr@outputthreechildren%
+  \fi%
 }%
 %    \end{macrocode}
 % \end{macro}
@@ -666,20 +702,24 @@
 %    \begin{macrocode}
 \def\MTr@outputlabel{%
 %    \end{macrocode}
-% First, set parameters: Height and depth of
-% the subtree are equal to height and depth of the label. The $x$ and
-% $w$ of the subtree each equal half the width of the label.
-% Optionally, $x$ may be zero and $w$ may equal the entire width of
-% the label. The width and height of the picture to be drawn equal the
-% width of the label and the heaght of the tree.
+% First, set parameters: Height and depth of the subtree are equal to
+% height and depth of the label. The $x$ and $w$ of the subtree each equal
+% half the width of the label. Optionally, $x$ may be zero and $w$ may
+% equal to the entire width of the label. The width and height of the
+% picture to be drawn equal the width of the label and the height of the
+% tree.
 %    \begin{macrocode}
     \global\MTr@treeheight\MTr@labelheight%
     \global\MTr@treedepth\MTr@labeldepth%
     \ifMTr@mytriangle%
-%%      \global\MTr@treew\wd\MTr@labelbox%
-%%      \global\MTr@treex0%
-      \global\MTr@treew\MTr@labelhalfwidth%
-      \global\MTr@treex\MTr@labelhalfwidth%
+      \MTr@treew\MTr@labelhalfwidth%
+      \MTr@treex\MTr@labelhalfwidth%
+      \multiply\MTr@treew \MTr@trianglemultright%
+      \multiply\MTr@treex \MTr@trianglemultleft%
+      \divide\MTr@treew 50%
+      \divide\MTr@treex 50%
+      \global\MTr@treew\MTr@treew%
+      \global\MTr@treex\MTr@treex%
     \else%
       \global\MTr@treew\MTr@labelhalfwidth%
       \global\MTr@treex\MTr@labelhalfwidth%
@@ -703,23 +743,76 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\MTr@outputonechild}
-% Output label and one child.
+%
+% Now, the macros for output with children. First, some utilitarian macros:
+% Set $y$ and "picheight" for given child.
 %    \begin{macrocode}
-\def\MTr@outputonechild{%
-    \MTr@treex\MTr@childonex%
-    \MTr@treew\MTr@childonew%
+\def\MTr@setchilddimens#1{%
+    \MTr@tempcnta-\MTr@branchheight%
+    \multiply\MTr@tempcnta\csname MTr@child#1branchmult\endcsname%
+    \MTr@tempcntb-\MTr@tempcnta%
+    \advance\MTr@tempcntb\csname MTr@child#1depth\endcsname%
+    \advance\MTr@tempcnta-\MTr@labelheight%
+    \advance\MTr@tempcnta\csname MTr@child#1height\endcsname%
+    \csname MTr@child#1y\endcsname\MTr@tempcnta%
+    \csname MTr@pic#1height\endcsname\MTr@tempcntb%
+}
+%    \end{macrocode}
+%
+% Calculate desired distance between two children. For the pair of
+% neighboring children, "tempcnta" is used temporarily to store what
+% amounts to the distance between the central points of the two children.
+% If it is below the value "childattachsep", adjust values so that is equal
+% to it. "tempcnta" stores the resulting value.
+%    \begin{macrocode}
+\def\MTr@adjustdistance#1#2{
+    \advance\csname MTr@child#1w\endcsname\MTr@childsidesep%
+    \MTr@tempcnta\csname MTr@child#1w\endcsname%
+    \advance\MTr@tempcnta\csname MTr@child#2x\endcsname%
+    \ifnum\MTr@tempcnta<\MTr@childattachsep%
+      \advance\csname MTr@child#1w\endcsname\MTr@childattachsep%
+      \advance\csname MTr@child#1w\endcsname-\MTr@tempcnta%
+      \MTr@tempcnta\MTr@childattachsep%
+    \fi%
+}
+%    \end{macrocode}
+% Set some parameters for the parent node. Parameters are the leftmost and
+% rightmost child label.
+%    \begin{macrocode}
+\def\MTr@setparentdimens#1#2{%
+%    \end{macrocode}
+% Calculate the subtree's $x$ and $w$:
+%    \begin{macrocode}
+    \divide\MTr@treex 2%
+    \MTr@treew\MTr@treex%
+    \advance\MTr@treex\csname MTr@child#1x\endcsname%
+    \advance\MTr@treew\csname MTr@child#2w\endcsname%
+%    \end{macrocode}
+% Calculate "morex": The distance the (first) subtree has to be shifted to
+% the right to accomodate a large parent label size.
+%    \begin{macrocode}
     \MTr@morex\MTr@labelhalfwidth%
-    \advance\MTr@morex -\MTr@treex%
-    \ifnum\MTr@morex<0\MTr@morex0\else\MTr@treex\MTr@labelhalfwidth\fi%
-    \ifnum\MTr@treew<\MTr@labelhalfwidth\MTr@treew\MTr@labelhalfwidth\fi%
-    \MTr@picwidth\MTr@treex\advance\MTr@picwidth\MTr@treew%
-    \MTr@childoney-\MTr@branchheight%
-    \multiply\MTr@childoney\MTr@childonebranchmult%
-    \MTr@picheight-\MTr@childoney%
-    \advance\MTr@picheight\MTr@childonedepth%
-    \advance\MTr@childoney-\MTr@labelheight%
-    \advance\MTr@childoney\MTr@childoneheight%
+    \advance\MTr@morex-\MTr@treex%
+    \ifnum\MTr@morex<0\MTr@morex0\fi%
+%    \end{macrocode}
+% Large label sizes are also incorporated into $w$ and $x$.
+%    \begin{macrocode}
+    \ifnum\MTr@treew<\MTr@labelhalfwidth
+        \MTr@treew\MTr@labelhalfwidth
+    \fi%
+    \ifnum\MTr@treex<\MTr@labelhalfwidth
+        \MTr@treex\MTr@labelhalfwidth
+    \fi%
+%    \end{macrocode}
+% Picture width.
+%    \begin{macrocode}
+    \MTr@picwidth\MTr@treex%
+    \advance\MTr@picwidth\MTr@treew%
+}
+%    \end{macrocode}
+% Set some parameters for the picture.
+%    \begin{macrocode}
+\def\MTr@setpictureparameters{%
     \global\MTr@treedepth\MTr@picheight%
     \advance\MTr@picheight\MTr@labelheight%
     \global\MTr@treeheight\MTr@labelheight%
@@ -728,92 +821,109 @@
     \advance\MTr@parenty-\MTr@lineoffset%
     \global\MTr@treex\MTr@treex%
     \global\MTr@treew\MTr@treew%
+}
+\def\MTr@drawlabel{%
+  \put(\MTr@treex,0){%
+    \makebox(0,0)[t]{%
+      \rule{0pt}{\MTr@minheight}%
+      \usebox{\MTr@labelbox}}}%
+}
+\def\MTr@drawchild#1{%
+  \put(\MTr@morex,\csname MTr@child#1y\endcsname){%
+    \makebox(0,0)[tl]{%
+      \usebox{\csname MTr@child#1box\endcsname}}}%
+}
+\def\MTr@drawchildline#1{
+  \csname ifMTr@child#1triangle\endcsname%
+    \MTr@tempcnta\csname MTr@child#1x\endcsname%
+    \MTr@tempcntb\csname MTr@child#1y\endcsname%
+    \advance\MTr@tempcnta\csname MTr@child#1w\endcsname%
+%    \advance\MTr@tempcnta\MTr@morex%
+    \put(0,0){\MTr@drawline%
+        (\MTr@treex,\MTr@parenty)%
+        (\MTr@morex,\MTr@tempcntb)}%
+    \put(0,0){\MTr@drawline%
+        (\MTr@treex,\MTr@parenty)%
+        (\MTr@tempcnta,\MTr@tempcntb)}%
+    \put(0,0){\MTr@drawline%
+        (\MTr@morex,\MTr@tempcntb)%
+        (\MTr@tempcnta,\MTr@tempcntb)}%
+  \else%
+  \put(0,0){\MTr@drawline%
+    (\MTr@treex,\MTr@parenty)%
+    (\csname MTr@child#1x\endcsname,\csname MTr@child#1y\endcsname)}%
+  \fi%
+}
+%    \end{macrocode}
+% \begin{macro}{\MTr@outputonechild}
+% Output label and one child.
+%    \begin{macrocode}
+\def\MTr@outputonechild{%
+%    \end{macrocode}
+% Calculate the subtree's $x$ and $w$:
+%    \begin{macrocode}
+    \MTr@treex0%
+    \MTr@setparentdimens{one}{one}%
+%    \end{macrocode}
+% Set vertical position and picture height for child one
+%    \begin{macrocode}
+    \MTr@setchilddimens{one}%
+%    \end{macrocode}
+% Set height based on child one.
+%    \begin{macrocode}
+    \MTr@picheight\MTr@piconeheight%
+%    \end{macrocode}
+% Set various other parameters.
+%    \begin{macrocode}
+    \MTr@setpictureparameters%
+%    \end{macrocode}
+% Start the picture.
+%    \begin{macrocode}
     \begin{picture}%
           (\MTr@picwidth,\MTr@picheight)%
           (0,-\MTr@picheight)%
-      \put(\MTr@treex,0){%
-        \makebox(0,0)[t]{%
-          \rule{0pt}{\MTr@minheight}%
-          \usebox{\MTr@labelbox}}}%
-      \put(\MTr@morex,\MTr@childoney){%
-        \makebox(0,0)[tl]{%
-          \usebox{\MTr@childonebox}}}%
+%    \end{macrocode}
+% First, the label.
+%    \begin{macrocode}
+      \MTr@drawlabel%
+%    \end{macrocode}
+% Draw child one.
+%    \begin{macrocode}
+    \MTr@drawchild{one}%
+%    \end{macrocode}
+% Advance child's $y$ to make the line stop just above the label.
+%    \begin{macrocode}
       \advance\MTr@childoney\MTr@lineoffset%
-      \ifMTr@childonetriangle%
-        \put(\MTr@treex,0){\MTr@drawline%
-            (0,\MTr@parenty)%
-            (-\MTr@childonex,\MTr@childoney)}%
-        \put(\MTr@treex,0){\MTr@drawline%
-            (0,\MTr@parenty)%
-            (\MTr@childonew,\MTr@childoney)}%
-        \put(\MTr@treex,0){\MTr@drawline%
-            (-\MTr@childonex,\MTr@childoney)%
-            (\MTr@childonew,\MTr@childoney)}%
-      \else%
-        \put(0,0){\MTr@drawline%
-            (\MTr@treex,\MTr@parenty)%
-            (\MTr@treex,\MTr@childoney)}%
-      \fi%
+%    \end{macrocode}
+% Draw a triangle or a line.
+%    \begin{macrocode}
+     \advance\MTr@childonex\MTr@morex%
+     \MTr@drawchildline{one}
+%    \end{macrocode}
+% End the picture.
+%    \begin{macrocode}
     \end{picture}%
 }
 %    \end{macrocode}
 % \end{macro}
+%
 % \begin{macro}{\MTr@outputtwochildren}
 % Two children.
 %    \begin{macrocode}
 \def\MTr@outputtwochildren{%
 %    \end{macrocode}
 % Calculate desired distance between the two children.
+% "treex" is used to store the resulting value. Next, set paramaters for
+% the parent label.
 %    \begin{macrocode}
-    \advance\MTr@childonew\MTr@childsidesep%
-    \MTr@treex\MTr@childonew%
-    \advance\MTr@treex\MTr@childtwox%
-    \ifnum\MTr@treex<\MTr@childattachsep%
-      \advance\MTr@childonew\MTr@childattachsep%
-      \advance\MTr@childonew-\MTr@treex%
-      \MTr@treex\MTr@childattachsep%
-    \fi%
+    \MTr@adjustdistance{one}{two}%
+    \MTr@treex\MTr@tempcnta%
+    \MTr@setparentdimens{one}{two}%
 %    \end{macrocode}
-% Calculate the subtree's $x$ and $w$:
+% Set vertical position and picture height for child one and two
 %    \begin{macrocode}
-    \divide\MTr@treex 2%
-    \MTr@treew\MTr@treex%
-    \advance\MTr@treex\MTr@childonex%
-    \advance\MTr@treew\MTr@childtwow%
-%    \end{macrocode}
-% Calculate "morex": The distance the subtree has to be shifted to the
-% right to accomodate a large label size.
-%    \begin{macrocode}
-    \MTr@morex\MTr@labelhalfwidth%
-    \advance\MTr@morex-\MTr@treex%
-    \ifnum\MTr@morex<0\MTr@morex0\fi%
-%    \end{macrocode}
-% Large label sizes are immedeately incorporated into $w$.
-%    \begin{macrocode}
-    \ifnum\MTr@treew<\MTr@labelhalfwidth\MTr@treew\MTr@labelhalfwidth\fi%
-%    \end{macrocode}
-% Picture width.
-%    \begin{macrocode}
-    \MTr@picwidth\MTr@treex%
-    \advance\MTr@picwidth\MTr@treew%
-%    \end{macrocode}
-% Something for child one.
-%    \begin{macrocode}
-    \MTr@childoney-\MTr@branchheight%
-    \multiply\MTr@childoney\MTr@childonebranchmult%
-    \MTr@piconeheight-\MTr@childoney%
-    \advance\MTr@piconeheight\MTr@childonedepth%
-    \advance\MTr@childoney-\MTr@labelheight%
-    \advance\MTr@childoney\MTr@childoneheight%
-%    \end{macrocode}
-% Same thing for child two.
-%    \begin{macrocode}
-    \MTr@childtwoy-\MTr@branchheight%
-    \multiply\MTr@childtwoy\MTr@childtwobranchmult%
-    \MTr@pictwoheight-\MTr@childtwoy%
-    \advance\MTr@pictwoheight\MTr@childtwodepth%
-    \advance\MTr@childtwoy-\MTr@labelheight%
-    \advance\MTr@childtwoy\MTr@childtwoheight%
+    \MTr@setchilddimens{one}%
+    \MTr@setchilddimens{two}%
 %    \end{macrocode}
 % Compare height based on child one with that based on child two.
 %    \begin{macrocode}
@@ -822,40 +932,130 @@
     \else%
       \MTr@picheight\MTr@pictwoheight%
     \fi%
-    \global\MTr@treedepth\MTr@picheight%
-    \advance\MTr@picheight\MTr@labelheight%
-    \global\MTr@treeheight\MTr@labelheight%
-    \MTr@parenty-\MTr@labelheight%
-    \advance\MTr@parenty-\MTr@labeldepth%
-    \advance\MTr@parenty-\MTr@lineoffset%
-    \global\MTr@treex\MTr@treex%
-    \global\MTr@treew\MTr@treew%
 %    \end{macrocode}
-% Draw the picture.
+% Set various other parameters.
+%    \begin{macrocode}
+    \MTr@setpictureparameters%
+%    \end{macrocode}
+% Start the picture.
 %    \begin{macrocode}
     \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
-      \put(\MTr@treex,0){%
-        \makebox(0,0)[t]{%
-          \rule{0pt}{\MTr@minheight}%
-          \usebox{\MTr@labelbox}}}%
-      \put(\MTr@morex,\MTr@childoney){%
-        \makebox(0,0)[tl]{%
-          \usebox{\MTr@childonebox}}}%
+%    \end{macrocode}
+% First, the label.
+%    \begin{macrocode}
+    \MTr@drawlabel%
+%    \end{macrocode}
+% Draw child one.
+%    \begin{macrocode}
+    \MTr@drawchild{one}%
+%    \end{macrocode}
+% Adjust child one's $x$ to include "morex", and caculate "morex" for child
+% two.
+%    \begin{macrocode}
       \advance\MTr@childonex\MTr@morex%
-      \advance\MTr@childoney\MTr@lineoffset%
       \MTr@morex\MTr@childonex%
       \advance\MTr@morex\MTr@childonew%
-      \put(\MTr@morex,\MTr@childtwoy){%
-        \makebox(0,0)[tl]{%
-          \usebox{\MTr@childtwobox}}}%
+%    \end{macrocode}
+% Draw child two.
+%    \begin{macrocode}
+    \MTr@drawchild{two}%
+%    \end{macrocode}
+% Adjust child two's $x$ to include "morex".
+%    \begin{macrocode}
       \advance\MTr@childtwox\MTr@morex%
+%    \end{macrocode}
+% Remove a bit from the children's $y$'s, to make the lines stop just above
+% the label, and draw them.
+%    \begin{macrocode}
+      \advance\MTr@childoney\MTr@lineoffset%
       \advance\MTr@childtwoy\MTr@lineoffset%
-      \put(0,0){\MTr@drawline%
-        (\MTr@treex,\MTr@parenty)%
-        (\MTr@childonex,\MTr@childoney)}%
-      \put(0,0){\MTr@drawline%
-        (\MTr@treex,\MTr@parenty)%
-        (\MTr@childtwox,\MTr@childtwoy)}%
+      \MTr@drawchildline{one}
+      \MTr@drawchildline{two}
+%    \end{macrocode}
+% End the picture.
+%    \begin{macrocode}
+    \end{picture}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\MTr@outputthreechildren}
+% Three children.
+%    \begin{macrocode}
+\def\MTr@outputthreechildren{%
+%    \end{macrocode}
+% Calculate desired distance between the three children.
+% The cumulative value is put into "treex". Next, set dimensions for the
+% label.
+%    \begin{macrocode}
+    \MTr@adjustdistance{one}{two}%
+    \MTr@treex\MTr@tempcnta%
+    \MTr@adjustdistance{two}{three}%
+    \advance\MTr@treex\MTr@tempcnta%
+    \MTr@setparentdimens{one}{three}%
+%    \end{macrocode}
+%
+% Set vertical position and picture height for all children.
+%    \begin{macrocode}
+    \MTr@setchilddimens{one}%
+    \MTr@setchilddimens{two}%
+    \MTr@setchilddimens{three}%
+%    \end{macrocode}
+% Height is the height of the largest child.
+%    \begin{macrocode}
+    \MTr@picheight\MTr@piconeheight%
+    \ifnum\MTr@pictwoheight>\MTr@picheight%
+      \MTr@picheight\MTr@pictwoheight%
+    \fi%
+    \ifnum\MTr@picthreeheight>\MTr@picheight%
+      \MTr@picheight\MTr@picthreeheight%
+    \fi%
+%    \end{macrocode}
+% Set various other parameters.
+%    \begin{macrocode}
+    \MTr@setpictureparameters%
+%    \end{macrocode}
+% Start the picture.
+%    \begin{macrocode}
+    \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
+%    \end{macrocode}
+% First, the label.
+%    \begin{macrocode}
+    \MTr@drawlabel%
+%    \end{macrocode}
+% Draw child one, adjust its $x$ to include "morex", and calculate "morex"
+% for child two.
+%    \begin{macrocode}
+    \MTr@drawchild{one}%
+      \advance\MTr@childonex\MTr@morex%
+      \MTr@morex\MTr@childonex%
+      \advance\MTr@morex\MTr@childonew%
+%    \end{macrocode}
+% Draw child two, adjust its $x$ to include "morex", and calculate "morex"
+% for child three.
+%    \begin{macrocode}
+    \MTr@drawchild{two}%
+      \advance\MTr@childtwox\MTr@morex%
+      \MTr@morex\MTr@childtwox%
+      \advance\MTr@morex\MTr@childtwow%
+%    \end{macrocode}
+% Draw child three, and adjust its $x$ to include "morex".
+%    \begin{macrocode}
+    \MTr@drawchild{three}%
+      \advance\MTr@childthreex\MTr@morex%
+%    \end{macrocode}
+% Remove a bit from the children's $y$'s, to make the lines stop just above
+% the label, and draw them.
+%    \begin{macrocode}
+      \advance\MTr@childoney\MTr@lineoffset%
+      \advance\MTr@childtwoy\MTr@lineoffset%
+      \advance\MTr@childthreey\MTr@lineoffset%
+      \MTr@drawchildline{one}
+      \MTr@drawchildline{two}
+      \MTr@drawchildline{three}
+%    \end{macrocode}
+% End the picture.
+%    \begin{macrocode}
     \end{picture}%
 }
 %    \end{macrocode}
