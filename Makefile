@@ -24,7 +24,9 @@ package: synttree.tar.gz
 
 clean:
 	rm -f *.aux *.log *.dvi *.toc *.sty *.glo *.idx *.ilg *.ind
+	rm -f *.pdf
+	rm -f synttree.tar.gz
 
 doc: 	synttree.dvi
 
-all:	doc test.dvi
+all:	doc test.dvi simple.dvi balance.dvi tree.dvi
