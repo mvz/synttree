@@ -1,4 +1,4 @@
-%% \CheckSum{864}
+%% \CheckSum{902}
 % \iffalse meta-comment
 %
 %  Copyright (c) 1998, 1999, 2001 Matijs van Zuijlen
@@ -33,6 +33,7 @@
 % 1.0a	    1999/10/02  Bugfix: bt combination changed to x.
 % 1.1	    1999/10/13  More children, better code.
 % 1.2	    2001	Totally new system
+%	    	    	    
 %
 %<*driver>
 \documentclass[a4paper]{ltxdoc}
@@ -53,8 +54,9 @@
 %\fi
 %\MakeShortVerb{\"} 
 % \title{The "synttree" package for typesetting syntactic
-% trees.\footnote{Package version 1.1, documentation version 0.9}}
-% \author{Matijs van Zuijlen}
+% trees.\footnote{Package version 1.2}}
+% \author{Matijs van Zuijlen\footnote{e-mail:
+% \texttt{Matijs.van.Zuijlen@xs4all}}}
 %
 % \maketitle
 %
@@ -93,9 +95,8 @@
 %  distance between levels constant. Second, the "???" package used
 %  PostScript for output.
 %
+%  Please send any comments or wishes to me, "Matijs.van.Zuijlen@xs4all.nl".
 %  \fi
-%
-%  Please send any comments or wishes to me, "mzuijlen@integral.nl".
 %
 %  \section{Usage}
 %
@@ -181,11 +182,18 @@
 %  \end{thebibliography}
 % }
 %
+% \section{Bugs}
+%
+% The method of appending ".t" or ".b" is currently tot supported due to
+% the new implementation. Profuse logging is produced inside the ".dvi"
+% file.
+%
 % \section{Implementation}
 %
 % \subsection{Two utility macros}
 %
-% (Taken from..., !!!!!!!) Very useful for putting stuff after a "\fi" (as
+% ^^A TODO: Add reference where I got this from.
+% Very useful for putting stuff after a "\fi" (as
 % the name implies).
 %    \begin{macrocode}
 \def\@AfterFi#1\fi{\fi#1}
@@ -257,6 +265,7 @@
 \newif\ifMTr@uselabel
 %    \end{macrocode}
 %
+% ^^A TODO: What do these do?
 %    \begin{macrocode}
 \newcount\MTr@mybranchmult
 \newif\ifMTr@mytriangle
@@ -264,7 +273,7 @@
 %
 % Two "savebox"es, one for the label, one to put the child in while it is
 % being defined, and a token register, to put the label in before it is
-% ready.
+% ready. ^^A TODO: One of these is not here.
 %    \begin{macrocode}
 \newbox\MTr@labelbox
 \newbox\MTr@treebox
@@ -297,6 +306,10 @@
     \MTr@makechildcounter{#1branchmult}
     \expandafter\newif\csname ifMTr@child#1triangle\endcsname%
 }
+%    \end{macrocode}
+% 
+% For now, we make three children:
+%    \begin{macrocode}
 \MTr@makechildstoreage{i}
 \MTr@makechildstoreage{ii}
 \MTr@makechildstoreage{iii}
@@ -310,6 +323,7 @@
 \newcount\MTr@treeheight
 \newcount\MTr@treedepth
 \newcount\MTr@branchmult
+\MTr@branchmult 1
 \newif\ifMTr@triangle
 %    \end{macrocode}
 % Next, the depth, height and half the width of the label.
@@ -323,6 +337,7 @@
 % where the line from the parent to the child starts. Also, we need the
 % width and height of the picture being drawn, and of each of the child
 % pictures.
+% ^^A TODO: pic[i*]height moet ook in de automatische definitie komen
 %    \begin{macrocode}
 \newcount\MTr@morex
 \newcount\MTr@parenty
@@ -340,9 +355,10 @@
 %    \end{macrocode}
 %
 % \subsection{Adjustable and other parameters}
-% The user can set up several parameters. First,%
-% \begin{macro}{\branchheight} "\branchheight" will set the distance
+% The user can set up several parameters.
+% First,\begin{macro}{\branchheight} "\branchheight" will set the distance
 % between levels. Default value is half an inch.
+% ^^A TODO: let default value depend on font size.
 %    \begin{macrocode}
 \newcount\MTr@branchheight%
 \newcommand{\branchheight}[1]{%
@@ -397,7 +413,6 @@
     \MTr@childattachsep\MTr@templength%
 }
 \childattachsep{0.5in}
-\MTr@branchmult 1
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -428,8 +443,9 @@
 % \end{macro}
 %
 % \subsection{Parsing}
-% 
-% Parsing will only work if at least one "]" ...
+% \iffalse[[[\fi
+% Parsing will only work if at least one "]" is present.
+% ^^A TODO: Combine this with the previous macro.
 % \begin{macro}{\MTr@parse}
 % "\MTr@parse"
 %    \begin{macrocode}
@@ -443,15 +459,18 @@
 % \end{macro}
 %
 % \begin{macro}{\MTr@parserightbracket}
-% Scan until "]". Argument "#1" will contain no "]", but may contain "[",
-% which are detected by "\MTr@parseleftbracket".
+% Scan until the first occurrance of "]". Argument "#1" will contain no
+% "]", but may contain some "[", which are detected by
+% "\MTr@parseleftbracket". After "#1" has been processed, lower the nesting
+% level. If we're back at 0, we're done. Otherwise, continue looking for
+% "]".
 %    \begin{macrocode}
 \def\MTr@parserightbracket#1]{%
   \MTr@parseleftbracket#1[:\END%
   \advance\MTr@level by -1%
   \MTr@dorightbracket%
   \ifnum\MTr@level=0%
-    End\newline%
+    \typeout{>> End}%
     \unhbox\MTr@childibox%
   \else
     \@AfterFi{\MTr@parserightbracket}%
@@ -460,8 +479,10 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\Mtr@parseleftbracket}
-% Scan after we already had one or more children: Just ignore anything
-% that is not a "[" or "]".
+% ^^A Scan after we already had one or more children: Just ignore anything
+% ^^A that is not a "[" or "]".
+% Scan until the first occurrance of "[". Argument "#1" will contain no "]"
+% or "[".
 % Vind eerste en verdere "[".
 % "#1" en "#2" bevatten allebei geen "]".
 % dus "#1" is mogelijk een label.
@@ -469,10 +490,10 @@
 %    \begin{macrocode}
 \def\MTr@parseleftbracket#1[#2\END{%
   \ifMTr@uselabel%
-    Label: #1\newline%
+    \typeout{>> Label: '#1'}%
     \setbox\MTr@labelbox\hbox{#1}%
   \else
-    Ignored: #1\newline%
+    \typeout{>> Ignored: '#1'}%
   \fi%
   \ifx#2:%
   \else
@@ -503,22 +524,26 @@
 % \end{macro}
 %
 % \begin{macro}{\MTr@dorightbracket}
-% Upon encountering a "]",
+% Upon encountering a "]", we typeset the current group's tree, and end the
+% group. Until we encounter some brackets, we should not add tokens to any
+% label. Save the just-typeset tree as the newest child in the parent group
+% --- now the current group.
+% ^^A TODO: Put this back into parserightbracket.
 %    \begin{macrocode}
 \def\MTr@dorightbracket{%
   \MTr@maketreebox%
   \egroup%
-  \advance\MTr@numchildren by 1%
   \MTr@uselabelfalse%
   \MTr@savecurrentchildbox%
 }
 \def\MTr@maketreebox{%
     \MTr@labelheight\ht\MTr@labelbox%
-    \typeout{>> label height: \the\MTr@labelheight.}%
+    \typeout{>> Label height: \the\MTr@labelheight.}%
     \ifnum\MTr@labelheight<\MTr@minheight\MTr@labelheight\MTr@minheight\fi%%
     \MTr@labeldepth\dp\MTr@labelbox%
     \MTr@labelhalfwidth\wd\MTr@labelbox%
     \divide\MTr@labelhalfwidth 2%
+    \typeout{>> Children: \the\MTr@numchildren.}%
     \ifnum\MTr@numchildren=0%
         \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}
     \fi
@@ -529,7 +554,7 @@
         \global\setbox\MTr@treebox\hbox{\MTr@outputtwochildren}
     \fi
     \ifnum\MTr@numchildren=3%
-        \global\setbox\MTr@treebox\hbox{\MTr@outputtwochildren}
+        \global\setbox\MTr@treebox\hbox{\MTr@outputthreechildren}
     \fi
     %\global\MTr@branchmult\MTr@mybranchmult%
     \ifMTr@mytriangle%
@@ -538,39 +563,43 @@
         \global\MTr@trianglefalse%
     \fi%
 }
+% \begin{macro}{\MTr@savecurrentchildbox}
+% Save the current picture, with all its data, in the box and registers for
+% the next empty child.
+%    \begin{macrocode}
 \def\MTr@savecurrentchildbox{%
-    \ifnum\MTr@numchildren=0%
-        No child??\newline%
+  \advance\MTr@numchildren by 1
+  \ifnum\MTr@numchildren<1%
+    \typeout{There is no child box to save.}%
+  \else
+    \ifnum\MTr@numchildren>3%
+      \typeout{I can save at most three child boxes.}%
     \else
-        \ifnum\MTr@numchildren>3%
-            Too many children!!\newline%
-        \else
-            \MTr@savechildbox{\romannumeral\MTr@numchildren}%
-        \fi
+      \MTr@savechildbox{\romannumeral\MTr@numchildren}%
     \fi
+  \fi
 }
 \def\MTr@savechildbox#1{%
-    \setbox%
-        \csname MTr@child#1box\endcsname%
-        \hbox{\unhbox\MTr@treebox}%
-    \csname MTr@child#1x\endcsname\MTr@treex%
-    \csname MTr@child#1w\endcsname\MTr@treew%
-    \csname MTr@child#1height\endcsname\MTr@treeheight%
-    \csname MTr@child#1depth\endcsname\MTr@treedepth%
-    \csname MTr@child#1branchmult\endcsname\MTr@branchmult%
-    \ifMTr@triangle%
-        \csname MTr@child#1triangletrue\endcsname%
-    \else%
-        \csname MTr@child#1trianglefalse\endcsname%
-    \fi
+  \setbox%
+    \csname MTr@child#1box\endcsname%
+    \hbox{\unhbox\MTr@treebox}%
+  \csname MTr@child#1x\endcsname\MTr@treex%
+  \csname MTr@child#1w\endcsname\MTr@treew%
+  \csname MTr@child#1height\endcsname\MTr@treeheight%
+  \csname MTr@child#1depth\endcsname\MTr@treedepth%
+  \csname MTr@child#1branchmult\endcsname\MTr@branchmult%
+  \ifMTr@triangle%
+    \csname MTr@child#1triangletrue\endcsname%
+  \else%
+    \csname MTr@child#1trianglefalse\endcsname%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\MTr@startlevel}
-% We're in a whole new world now: We begin (again) by setting the
-% number of children to 0, and then reading any parameters for this
-% level.
+% This is unused! Use what's done here and in the next macro to get the "."
+% syntax working again!
 %    \begin{macrocode}
 \def\MTr@startlevel{%
   \MTr@numchildren 0%
@@ -637,44 +666,7 @@
   \MTr@mybranchmult1}
 %    \end{macrocode}
 % \end{macro}
-%
-% \subsection{Saving the children}
-% Here are the macros for actually storing the children in the child
-% boxes. For each child, store the tree itself, its $x$ position, its
-% width, height and depth, its branch multiplication and whether or
-% not it is a triangle. We use a generic save routine to save the children.
-%    \begin{macrocode}
-\def\MTr@save#1{%
-  \sbox{\csname MTr@child#1box\endcsname}{\usebox{\MTr@childbox}}%
-  \csname MTr@child#1x\endcsname\MTr@treex%
-  \csname MTr@child#1w\endcsname\MTr@treew%
-  \csname MTr@child#1height\endcsname\MTr@treeheight%
-  \csname MTr@child#1depth\endcsname\MTr@treedepth%
-  \csname MTr@child#1branchmult\endcsname\MTr@branchmult%
-  \ifMTr@triangle%
-    \csname MTr@child#1triangletrue\endcsname%
-  \else%
-    \csname MTr@child#1trianglefalse\endcsname%
-  \fi}
-%    \end{macrocode}
-% Save any child.
-%    \begin{macrocode}
-\def\MTr@savechildboxold{%
-    \ifnum\MTr@numchildren=1
-      \MTr@save{i}%
-    \else
-      \ifnum\MTr@numchildren=2
-        \MTr@save{ii}%
-      \else
-        \ifnum\MTr@numchildren=3
-          \MTr@save{iii}%
-        \else
-          \typeout{synttree Error: Trying to save fourth child.}%
-        \fi
-      \fi
-    \fi
-}
-%    \end{macrocode}
+% 
 % \subsection{Creating the tree}
 % \begin{macro}{\MTr@maketree}
 % This macro is a horrible beast. It is the complete code for making
@@ -728,6 +720,7 @@
     \begin{picture}%
         (\MTr@picwidth,\MTr@picheight)%
         (-\MTr@treex,-\MTr@picheight)%
+      \put(-\MTr@treex,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \put(-\MTr@treex,0){%
         \makebox(0,0)[tl]{%
           \rule{0pt}{\MTr@minheight}%
@@ -758,7 +751,7 @@
 % If it is below the value "childattachsep", adjust values so that is equal
 % to it. "tempcnta" stores the resulting value.
 %    \begin{macrocode}
-\def\MTr@adjustdistance#1#2{
+\def\MTr@adjustdistance#1#2{%
     \advance\csname MTr@child#1w\endcsname\MTr@childsidesep%
     \MTr@tempcnta\csname MTr@child#1w\endcsname%
     \advance\MTr@tempcnta\csname MTr@child#2x\endcsname%
@@ -827,6 +820,10 @@
       \usebox{\csname MTr@child#1box\endcsname}}}%
 }
 \def\MTr@drawchildline#1{
+  \typeout{>> treex: \the\MTr@treex.}%
+  \typeout{>> parenty: \the\MTr@parenty.}%
+  \typeout{>> childx: \the\csname MTr@child#1x\endcsname.}%
+  \typeout{>> childy: \the\csname MTr@child#1y\endcsname.}%
   \csname ifMTr@child#1triangle\endcsname%
     \MTr@tempcnta\csname MTr@child#1x\endcsname%
     \MTr@tempcntb\csname MTr@child#1y\endcsname%
@@ -875,6 +872,7 @@
     \begin{picture}%
           (\MTr@picwidth,\MTr@picheight)%
           (0,-\MTr@picheight)%
+      \put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
 %    \end{macrocode}
 % First, the label.
 %    \begin{macrocode}
@@ -933,6 +931,7 @@
 % Start the picture.
 %    \begin{macrocode}
     \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
+      \put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
 %    \end{macrocode}
 % First, the label.
 %    \begin{macrocode}
@@ -1011,6 +1010,7 @@
 % Start the picture.
 %    \begin{macrocode}
     \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
+      \put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
 %    \end{macrocode}
 % First, the label.
 %    \begin{macrocode}
