@@ -511,7 +511,7 @@
 \def\MTr@parsedot#1.#2 #3\END{
   \ifx:#2
     \setbox\MTr@labelbox\hbox{}
-    \MTr@setlabel#1 \END
+    \MTr@setlabel #1 \END
   \else
     \ifx#2b\MTr@bottomnodetrue\else%
     \ifx#2x\MTr@bottomnodetrue\MTr@mytriangletrue\else%
@@ -522,13 +522,18 @@
   \fi
 }
 \def\MTr@setlabel#1 #2\END{
-  \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox x#1x}
-  \ifx #2
-  \else\ifx#2\empty
+  \if\space#1
   \else
-    \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{}y y}
+    \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox #1}
+  \fi
+  \if\space#2
+  \else
+    \if\space#1
+    \else
+      \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{} }
+    \fi
     \MTr@setlabel#2\END
-  \fi\fi
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
