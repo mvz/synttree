@@ -36,6 +36,7 @@
 % 1.2	    2001	Totally new system
 % 1.3	    2004/11/07	New system up and running.
 % 1.3.1	    2004/11/07	Prepared for packaging, clarified licensing.
+%      	    2004/12/30	Ignore leading and trailing spaces in labels.
 %
 %<*driver>
 \documentclass[a4paper]{ltxdoc}
@@ -146,21 +147,27 @@
 %  \item \synttree[A[B][C]]
 % \end{trivlist}
 %
-% Using the optional parameters, we may specify
+%  Note that leading and trailing spaces in the label will be ignored, so
+%  the following has the same result:
+%\begin{verbatim}
+%  \synttree[ A [ B ][ C ]]
+%\end{verbatim}
+%
+%  Using the optional parameters, the line
 %\begin{verbatim}
 %  \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
 %\end{verbatim}%
-%  to create:
+%  creates this tree:
 % \begin{trivlist}
 %  \item \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
 % \end{trivlist}
+%
 %
 %  \section{Wish List and Bugs}
 %
 % I hope to add the following features sooner or later:
 % \begin{itemize}
-%   \item Let labels ignore starting and trailing whitespace.
-%   \item Larger number of children. The current limit is three. Ideally,
+%   \item A larger number of children. The current limit is three. Ideally,
 %   any arbitrary number of children will be supported.
 %   \item Control over other parameters affecting the `look' of the tree.
 %   \item The possibility of `sinking' the tree on the current line,

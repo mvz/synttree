@@ -35,7 +35,7 @@ synttree.dvi: synttree.dtx synttree.sty
 synttree.pdf: synttree.dvi
 	dvipdfm $^
 
-synttree.tar.gz: synttree.dtx synttree.ins README synttree.pdf readme.txt
+synttree.tar.gz: synttree.dtx synttree.ins README synttree.pdf
 	tar cvzf $@ $^
 
 simple.dvi balance.dvi tree.dvi : %.dvi : %.tex
