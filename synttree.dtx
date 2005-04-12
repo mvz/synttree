@@ -317,7 +317,6 @@
     \expandafter\newcount\csname MTr@child#1\endcsname%
 }
 \def\MTr@makechildstoreage#1{
-    \typeout{Making child storage for #1}%
     \expandafter\newsavebox\csname MTr@child#1box\endcsname%
     \MTr@makechildcounter{#1x}
     \MTr@makechildcounter{#1y}
@@ -597,13 +596,10 @@
   \fi
 }
 \def\MTr@savechildbox#1{%
-  \typeout{Saving child box!}%
   \expandafter
   \ifx\csname MTr@child#1box\endcsname\relax%
-    \typeout{Not defined: #1}%
     \MTr@makechildstoreage{#1}%
   \fi%
-  \typeout{AAA!}%
   \setbox%
   \csname MTr@child#1box\endcsname%
   \hbox{\unhbox\MTr@treebox}%
@@ -799,11 +795,6 @@
 %    \begin{macrocode}
   \MTr@tempcnta\MTr@childparam{#1}{y}
   \advance\MTr@tempcnta\MTr@lineoffset%
-  \typeout{if triangle: #1}%
-  \expandafter
-  \ifx\csname ifMTr@child#1triangle\endcsname\relax%
-    \typeout{Not defined: #1 triangle}%
-  \fi%
   \expandafter
   \ifnum\csname MTr@child#1triangle\endcsname=1%
     \MTr@tempcntb\MTr@childparam{#1}{x}%
