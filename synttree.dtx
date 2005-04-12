@@ -204,13 +204,21 @@
 %
 % \section{Implementation}
 %
-% \subsection{Two utility macros}
+% \subsection{Utility macros}
 %
-% Very useful for putting stuff after a "\fi" (as the name implies)
+% Very useful for putting stuff after a "\fi" (as the name implies).
 % \cite{BasicControl}.
 %    \begin{macrocode}
 \def\@AfterFi#1\fi{\fi#1}
 \def\@AfterElseFi#1\else#2\fi{\fi#1}
+%    \end{macrocode}
+%
+% String comparison, is a macro defined.
+% TODO!!!
+% \cite{BasicControl}.
+%    \begin{macrocode}
+% \def\@ifDefinedCs#1{\expandafter\ifx}
+% \def\@AfterElseFi#1\else#2\fi{\fi#1}
 %    \end{macrocode}
 %
 % \subsection{Drawing commands}
@@ -309,6 +317,7 @@
     \expandafter\newcount\csname MTr@child#1\endcsname%
 }
 \def\MTr@makechildstoreage#1{
+    \typeout{Making child storage for #1}%
     \expandafter\newsavebox\csname MTr@child#1box\endcsname%
     \MTr@makechildcounter{#1x}
     \MTr@makechildcounter{#1y}
@@ -317,18 +326,11 @@
     \MTr@makechildcounter{#1height}
     \MTr@makechildcounter{#1depth}
     \MTr@makechildcounter{#1branchmult}
-    \expandafter\newcount\csname MTr@pic#1height\endcsname
-    \expandafter\newif\csname ifMTr@child#1triangle\endcsname%
+    \MTr@makechildcounter{#1picheight}
+    \MTr@makechildcounter{#1triangle}
 }
 %    \end{macrocode}
 % 
-% For now, we make three children:
-%    \begin{macrocode}
-\MTr@makechildstoreage{i}
-\MTr@makechildstoreage{ii}
-\MTr@makechildstoreage{iii}
-%    \end{macrocode}
-%
 % \begin{macro}{\MTr@childparam}
 % We also need an easy way to retrieve each child's parameters. This way,
 % we don't have to use the "\csname" construct all the time.
@@ -595,9 +597,16 @@
   \fi
 }
 \def\MTr@savechildbox#1{%
+  \typeout{Saving child box!}%
+  \expandafter
+  \ifx\csname MTr@child#1box\endcsname\relax%
+    \typeout{Not defined: #1}%
+    \MTr@makechildstoreage{#1}%
+  \fi%
+  \typeout{AAA!}%
   \setbox%
-    \csname MTr@child#1box\endcsname%
-    \hbox{\unhbox\MTr@treebox}%
+  \csname MTr@child#1box\endcsname%
+  \hbox{\unhbox\MTr@treebox}%
   \csname MTr@child#1v\endcsname\MTr@treev%
   \csname MTr@child#1w\endcsname\MTr@treew%
   \csname MTr@child#1x\endcsname\MTr@treev%
@@ -605,9 +614,9 @@
   \csname MTr@child#1depth\endcsname\MTr@treedepth%
   \csname MTr@child#1branchmult\endcsname\MTr@branchmult%
   \ifMTr@triangle%
-    \csname MTr@child#1triangletrue\endcsname%
+    \csname MTr@child#1triangle\endcsname 1%
   \else%
-    \csname MTr@child#1trianglefalse\endcsname%
+    \csname MTr@child#1triangle\endcsname 0%
   \fi
 }
 %    \end{macrocode}
@@ -677,7 +686,7 @@
     \advance\MTr@tempcnta-\MTr@labelheight%
     \advance\MTr@tempcnta\csname MTr@child#1height\endcsname%
     \csname MTr@child#1y\endcsname\MTr@tempcnta%
-    \csname MTr@pic#1height\endcsname\MTr@tempcntb%
+    \csname MTr@child#1picheight\endcsname\MTr@tempcntb%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -790,7 +799,13 @@
 %    \begin{macrocode}
   \MTr@tempcnta\MTr@childparam{#1}{y}
   \advance\MTr@tempcnta\MTr@lineoffset%
-  \csname ifMTr@child#1triangle\endcsname%
+  \typeout{if triangle: #1}%
+  \expandafter
+  \ifx\csname ifMTr@child#1triangle\endcsname\relax%
+    \typeout{Not defined: #1 triangle}%
+  \fi%
+  \expandafter
+  \ifnum\csname MTr@child#1triangle\endcsname=1%
     \MTr@tempcntb\MTr@childparam{#1}{x}%
     \MTr@tempcntc\MTr@tempcntb%
     \advance\MTr@tempcntb \MTr@childparam{#1}{w}%
@@ -911,7 +926,7 @@
 %    \end{macrocode}
 % Set height based on child one.
 %    \begin{macrocode}
-    \MTr@picheight\MTr@piciheight%
+    \MTr@picheight\MTr@childipicheight%
 %    \end{macrocode}
 % Set various other parameters.
 %    \begin{macrocode}
@@ -926,7 +941,7 @@
       %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \MTr@drawlabel%
       \MTr@drawchild{i}%
-     \MTr@drawchildline{i}
+      \MTr@drawchildline{i}
     \end{picture}%
 }
 %    \end{macrocode}
@@ -956,10 +971,10 @@
 %    \end{macrocode}
 % Compare height based on child one with that based on child two.
 %    \begin{macrocode}
-    \ifnum\MTr@piciheight>\MTr@piciiheight%
-      \MTr@picheight\MTr@piciheight%
+    \ifnum\MTr@childipicheight>\MTr@childiipicheight%
+      \MTr@picheight\MTr@childipicheight%
     \else%
-      \MTr@picheight\MTr@piciiheight%
+      \MTr@picheight\MTr@childiipicheight%
     \fi%
 %    \end{macrocode}
 % Set various other parameters.
@@ -1006,12 +1021,12 @@
 %    \end{macrocode}
 % Height is the height of the largest child.
 %    \begin{macrocode}
-    \MTr@picheight\MTr@piciheight%
-    \ifnum\MTr@piciiheight>\MTr@picheight%
-      \MTr@picheight\MTr@piciiheight%
+    \MTr@picheight\MTr@childipicheight%
+    \ifnum\MTr@childiipicheight>\MTr@picheight%
+      \MTr@picheight\MTr@childiipicheight%
     \fi%
-    \ifnum\MTr@piciiiheight>\MTr@picheight%
-      \MTr@picheight\MTr@piciiiheight%
+    \ifnum\MTr@childiiipicheight>\MTr@picheight%
+      \MTr@picheight\MTr@childiiipicheight%
     \fi%
 %    \end{macrocode}
 % Set various other parameters.
