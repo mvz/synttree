@@ -586,10 +586,11 @@
 \def\MTr@savecurrentchildbox{%
   \advance\MTr@numchildren by 1
   \ifnum\MTr@numchildren<1%
-    \typeout{There is no child box to save.}%
+    \typeout{synttree internal warning: There is no child box to save.}%
   \else
-    \ifnum\MTr@numchildren>3%
-      \typeout{I can save at most three child boxes.}%
+    \ifnum\MTr@numchildren>10%
+      \typeout{synttree warning: I can save at most 10 child boxes.}%
+      \advance\MTr@numchildren by -1
     \else
       \MTr@savechildbox{\romannumeral\MTr@numchildren}%
     \fi
@@ -840,8 +841,11 @@
   \ifnum\MTr@numchildren=2%
     \global\setbox\MTr@treebox\hbox{\MTr@outputtwochildren}
   \fi
-  \ifnum\MTr@numchildren=3%
+  \ifnum\MTr@numchildren>2%
     \global\setbox\MTr@treebox\hbox{\MTr@outputthreechildren}
+  \fi
+  \ifnum\MTr@numchildren>3%
+    \typeout{synttree Warning: Ignoring extra children in output.}%
   \fi
   \global\MTr@branchmult\MTr@mybranchmult%
   \ifMTr@mytriangle%
