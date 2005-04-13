@@ -1033,10 +1033,7 @@
 % Start the picture, draw the label, the children, and the lines to the
 % children, and end the picture.
 %    \begin{macrocode}
-    \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
-      %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \MTr@outputchildren{3}%
-    \end{picture}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1044,14 +1041,20 @@
 % Common code for any number of children.
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
-  \MTr@drawlabel%
-  \MTr@tempcnta #1
-  \loop {\edef\MTr@temp{\romannumeral\MTr@tempcnta}%
-    \expandafter\MTr@drawchild{\MTr@temp}%
-    \expandafter\MTr@drawchildline{\MTr@temp}
-    }
-    \advance \MTr@tempcnta by -1
-    \ifnum\MTr@tempcnta>0 \repeat
+  \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
+    %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+    \MTr@drawlabel%
+    \MTr@tempcnta #1
+    \loop
+      {
+	\edef\MTr@temp{\romannumeral\MTr@tempcnta}%
+	\expandafter\MTr@drawchild{\MTr@temp}%
+	\expandafter\MTr@drawchildline{\MTr@temp}
+      }
+      \advance \MTr@tempcnta by -1
+      \ifnum\MTr@tempcnta>0
+    \repeat
+  \end{picture}%
 }
 %    \end{macrocode}
 % \end{macro}
