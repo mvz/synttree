@@ -921,10 +921,6 @@
 %    \begin{macrocode}
     \MTr@setverticalchilddimens{i}%
 %    \end{macrocode}
-% Set height based on child one.
-%    \begin{macrocode}
-    \MTr@picheight\MTr@childipicheight%
-%    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
     \MTr@outputchildren{1}%
@@ -953,14 +949,6 @@
 %    \begin{macrocode}
     \MTr@setverticalchilddimens{i}%
     \MTr@setverticalchilddimens{ii}%
-%    \end{macrocode}
-% Height is the height of the largest child.
-%    \begin{macrocode}
-    \ifnum\MTr@childipicheight>\MTr@childiipicheight%
-      \MTr@picheight\MTr@childipicheight%
-    \else%
-      \MTr@picheight\MTr@childiipicheight%
-    \fi%
 %    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
@@ -992,16 +980,6 @@
     \MTr@setverticalchilddimens{ii}%
     \MTr@setverticalchilddimens{iii}%
 %    \end{macrocode}
-% Height is the height of the largest child.
-%    \begin{macrocode}
-    \MTr@picheight\MTr@childipicheight%
-    \ifnum\MTr@childiipicheight>\MTr@picheight%
-      \MTr@picheight\MTr@childiipicheight%
-    \fi%
-    \ifnum\MTr@childiiipicheight>\MTr@picheight%
-      \MTr@picheight\MTr@childiiipicheight%
-    \fi%
-%    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
     \MTr@outputchildren{3}%
@@ -1012,6 +990,21 @@
 % Common code for any number of children:
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
+%    \end{macrocode}
+% Height is the height of the largest child.
+%    \begin{macrocode}
+    \MTr@picheight\MTr@childipicheight%
+    \MTr@tempcnta #1
+    \loop
+      {%
+	\edef\MTr@temp{\romannumeral\MTr@tempcnta}%
+	\ifnum\MTr@childparam{\MTr@temp}{picheight}>\MTr@picheight%
+	  \MTr@picheight\MTr@childparam{\MTr@temp}{picheight}%
+	\fi%
+      }%
+      \advance \MTr@tempcnta by -1
+      \ifnum\MTr@tempcnta>0
+    \repeat
 %    \end{macrocode}
 % Set various other parameters.
 %    \begin{macrocode}
