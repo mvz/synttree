@@ -368,6 +368,7 @@
 % Finally, we need a temporary length, and three temporary counters.
 %    \begin{macrocode}
 \newlength{\MTr@templength}
+\newcount\MTr@loopcnta
 \newcount\MTr@tempcnta
 \newcount\MTr@tempcntb
 \newcount\MTr@tempcntc
@@ -974,12 +975,6 @@
     \advance\MTr@childiiix\MTr@morex%
 %    \end{macrocode}
 %
-% Set vertical position and picture height for all children.
-%    \begin{macrocode}
-    \MTr@setverticalchilddimens{i}%
-    \MTr@setverticalchilddimens{ii}%
-    \MTr@setverticalchilddimens{iii}%
-%    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
     \MTr@outputchildren{3}%
@@ -991,20 +986,23 @@
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
 %    \end{macrocode}
+% Set vertical position and picture height for all children.
+%    \begin{macrocode}
+    \MTr@loopcnta #1
+    \loop
+      \MTr@setverticalchilddimens{\romannumeral\MTr@loopcnta}%
+    \advance \MTr@loopcnta by -1 \ifnum\MTr@loopcnta>0 \repeat
+%    \end{macrocode}
 % Height is the height of the largest child.
 %    \begin{macrocode}
     \MTr@picheight\MTr@childipicheight%
-    \MTr@tempcnta #1
+    \MTr@loopcnta #1
     \loop
-      {%
-	\edef\MTr@temp{\romannumeral\MTr@tempcnta}%
-	\ifnum\MTr@childparam{\MTr@temp}{picheight}>\MTr@picheight%
-	  \MTr@picheight\MTr@childparam{\MTr@temp}{picheight}%
-	\fi%
-      }%
-      \advance \MTr@tempcnta by -1
-      \ifnum\MTr@tempcnta>0
-    \repeat
+      \edef\MTr@temp{\romannumeral\MTr@loopcnta}%
+      \ifnum\MTr@childparam{\MTr@temp}{picheight}>\MTr@picheight%
+	\MTr@picheight\MTr@childparam{\MTr@temp}{picheight}%
+      \fi%
+    \advance \MTr@loopcnta by -1 \ifnum\MTr@loopcnta>0 \repeat
 %    \end{macrocode}
 % Set various other parameters.
 %    \begin{macrocode}
@@ -1016,16 +1014,11 @@
   \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
     %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
     \MTr@drawlabel%
-    \MTr@tempcnta #1
+    \MTr@loopcnta #1
     \loop
-      {
-	\edef\MTr@temp{\romannumeral\MTr@tempcnta}%
-	\expandafter\MTr@drawchild{\MTr@temp}%
-	\expandafter\MTr@drawchildline{\MTr@temp}
-      }
-      \advance \MTr@tempcnta by -1
-      \ifnum\MTr@tempcnta>0
-    \repeat
+      \expandafter\MTr@drawchild{\romannumeral\MTr@loopcnta}%
+      \expandafter\MTr@drawchildline{\romannumeral\MTr@loopcnta}
+    \advance \MTr@loopcnta by -1 \ifnum\MTr@loopcnta>0 \repeat
   \end{picture}%
 }
 %    \end{macrocode}
