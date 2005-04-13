@@ -514,6 +514,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%^^A TODO: Maybe this can be done simpler by using \futurelet in some way.
 % \begin{macro}{\Mtr@parsedot}
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{
@@ -631,11 +632,12 @@
 % \begin{macro}{\MTr@drawchild}
 %    \begin{macrocode}
 \def\MTr@drawchild#1{%
-  \MTr@tempcnta\MTr@childparam{#1}{x}
+  {\MTr@tempcnta\MTr@childparam{#1}{x}
   \advance\MTr@tempcnta-\MTr@childparam{#1}{v}
   \put(\MTr@tempcnta,\MTr@childparam{#1}{y}){%
     \makebox(0,0)[tl]{%
       \usebox{\csname MTr@child#1box\endcsname}}}%
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -964,7 +966,7 @@
     \MTr@setverticalchilddimens{i}%
     \MTr@setverticalchilddimens{ii}%
 %    \end{macrocode}
-% Compare height based on child one with that based on child two.
+% Height is the height of the largest child.
 %    \begin{macrocode}
     \ifnum\MTr@childipicheight>\MTr@childiipicheight%
       \MTr@picheight\MTr@childipicheight%
@@ -983,8 +985,8 @@
       %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \MTr@drawlabel%
       \MTr@drawchild{i}
-      \MTr@drawchild{ii}
       \MTr@drawchildline{i}
+      \MTr@drawchild{ii}
       \MTr@drawchildline{ii}
     \end{picture}%
 }
@@ -1033,14 +1035,23 @@
 %    \begin{macrocode}
     \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
       %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
-      \MTr@drawlabel%
-      \MTr@drawchild{i}%
-      \MTr@drawchild{ii}%
-      \MTr@drawchild{iii}%
-      \MTr@drawchildline{i}
-      \MTr@drawchildline{ii}
-      \MTr@drawchildline{iii}
+      \MTr@outputchildren{3}%
     \end{picture}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\MTr@outputchildren}
+% Common code for any number of children.
+%    \begin{macrocode}
+\def\MTr@outputchildren#1{%
+  \MTr@drawlabel%
+  \MTr@tempcnta #1
+  \loop {\edef\MTr@temp{\romannumeral\MTr@tempcnta}%
+    \expandafter\MTr@drawchild{\MTr@temp}%
+    \expandafter\MTr@drawchildline{\MTr@temp}
+    }
+    \advance \MTr@tempcnta by -1
+    \ifnum\MTr@tempcnta>0 \repeat
 }
 %    \end{macrocode}
 % \end{macro}
