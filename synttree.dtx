@@ -915,12 +915,8 @@
 % label's width. After the call to "setparentdimens", all children's $x$
 % values must be advanced by "morex"
 %    \begin{macrocode}
-    \MTr@setparentdimens{i}{i}%
-    \advance\MTr@childix\MTr@morex%
-%    \end{macrocode}
-% Set vertical position and picture height for child one
-%    \begin{macrocode}
-    \MTr@setverticalchilddimens{i}%
+%%%    \MTr@setparentdimens{i}{i}%
+%%%    \advance\MTr@childix\MTr@morex%
 %    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
@@ -939,17 +935,12 @@
 % the parent label.
 %    \begin{macrocode}
     \MTr@adjustdistance{i}{ii}%
-    \MTr@setparentdimens{i}{ii}%
+%%%    \MTr@setparentdimens{i}{ii}%
 %    \end{macrocode}
 % Adjust children's $x$ to include "morex", 
 %    \begin{macrocode}
-    \advance\MTr@childix\MTr@morex%
-    \advance\MTr@childiix\MTr@morex%
-%    \end{macrocode}
-% Set vertical position and picture height for child one and two
-%    \begin{macrocode}
-    \MTr@setverticalchilddimens{i}%
-    \MTr@setverticalchilddimens{ii}%
+%%%    \advance\MTr@childix\MTr@morex%
+%%%    \advance\MTr@childiix\MTr@morex%
 %    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
@@ -969,10 +960,10 @@
 %    \begin{macrocode}
     \MTr@adjustdistance{i}{ii}%
     \MTr@adjustdistance{ii}{iii}%
-    \MTr@setparentdimens{i}{iii}%
-    \advance\MTr@childix\MTr@morex%
-    \advance\MTr@childiix\MTr@morex%
-    \advance\MTr@childiiix\MTr@morex%
+%%%    \MTr@setparentdimens{i}{iii}%
+%%%    \advance\MTr@childix\MTr@morex%
+%%%    \advance\MTr@childiix\MTr@morex%
+%%%    \advance\MTr@childparam{iii}{x}\MTr@morex%
 %    \end{macrocode}
 %
 % Set various other parameters, draw the children.
@@ -986,19 +977,23 @@
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
 %    \end{macrocode}
-% Set vertical position and picture height for all children.
 %    \begin{macrocode}
     \MTr@loopcnta #1
     \loop
-      \MTr@setverticalchilddimens{\romannumeral\MTr@loopcnta}%
     \advance \MTr@loopcnta by -1 \ifnum\MTr@loopcnta>0 \repeat
+    \MTr@setparentdimens{i}{\romannumeral#1}%
 %    \end{macrocode}
+% After the call to "setparentdimens", all children's $x$
+% values must be advanced by "morex"
+% Set vertical position and picture height for all children.
 % Height is the height of the largest child.
 %    \begin{macrocode}
-    \MTr@picheight\MTr@childipicheight%
+    \MTr@picheight 0%
     \MTr@loopcnta #1
     \loop
       \edef\MTr@temp{\romannumeral\MTr@loopcnta}%
+      \advance\MTr@childparam{\MTr@temp}{x}\MTr@morex%
+      \MTr@setverticalchilddimens{\romannumeral\MTr@loopcnta}%
       \ifnum\MTr@childparam{\MTr@temp}{picheight}>\MTr@picheight%
 	\MTr@picheight\MTr@childparam{\MTr@temp}{picheight}%
       \fi%
