@@ -213,14 +213,6 @@
 \def\@AfterElseFi#1\else#2\fi{\fi#1}
 %    \end{macrocode}
 %
-% String comparison, is a macro defined.
-% TODO!!!
-% \cite{BasicControl}.
-%    \begin{macrocode}
-% \def\@ifDefinedCs#1{\expandafter\ifx}
-% \def\@AfterElseFi#1\else#2\fi{\fi#1}
-%    \end{macrocode}
-%
 % \subsection{Drawing commands}
 %
 % These command are used to draw the lines between the nodes. There are two
@@ -633,12 +625,11 @@
 % \begin{macro}{\MTr@drawchild}
 %    \begin{macrocode}
 \def\MTr@drawchild#1{%
-  {\MTr@tempcnta\MTr@childparam{#1}{x}
+  \MTr@tempcnta\MTr@childparam{#1}{x}
   \advance\MTr@tempcnta-\MTr@childparam{#1}{v}
   \put(\MTr@tempcnta,\MTr@childparam{#1}{y}){%
     \makebox(0,0)[tl]{%
       \usebox{\csname MTr@child#1box\endcsname}}}%
-  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -838,18 +829,10 @@
   \ifnum\MTr@numchildren=0%
     \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}
   \fi
-  \ifnum\MTr@numchildren=1%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{1}}
+  \ifnum\MTr@numchildren>0%
+    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{\the\MTr@numchildren}}%
   \fi
-  \ifnum\MTr@numchildren=2%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{2}}
-  \fi
-  \ifnum\MTr@numchildren>2%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{3}}
-  \fi
-  \ifnum\MTr@numchildren>3%
-    \typeout{synttree Warning: Ignoring extra children in output.}%
-  \fi
+
   \global\MTr@branchmult\MTr@mybranchmult%
   \ifMTr@mytriangle%
     \global\MTr@triangletrue%
@@ -897,7 +880,7 @@
     \begin{picture}%
         (\MTr@picwidth,\MTr@picheight)%
         (-\MTr@treev,-\MTr@picheight)%
-      %\put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+      \put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \put(-\MTr@treev,0){%
         \makebox(0,0)[tl]{%
           \rule{0pt}{\MTr@minheight}%
@@ -954,7 +937,7 @@
 % children, and end the picture.
 %    \begin{macrocode}
   \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
-    %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+    \put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
     \MTr@drawlabel%
     \MTr@loopcnta #1
     \loop
