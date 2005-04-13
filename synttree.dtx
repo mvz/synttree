@@ -911,13 +911,6 @@
 %    \begin{macrocode}
 \def\MTr@outputonechild{%
 %    \end{macrocode}
-% Calculate the subtree's $v$ and $w$, based on the single child, and the
-% label's width. After the call to "setparentdimens", all children's $x$
-% values must be advanced by "morex"
-%    \begin{macrocode}
-%%%    \MTr@setparentdimens{i}{i}%
-%%%    \advance\MTr@childix\MTr@morex%
-%    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
     \MTr@outputchildren{1}%
@@ -929,18 +922,6 @@
 % Two children.
 %    \begin{macrocode}
 \def\MTr@outputtwochildren{%
-%    \end{macrocode}
-% Calculate desired distance between the two children.
-% "treev" is used to store the resulting value. Next, set paramaters for
-% the parent label.
-%    \begin{macrocode}
-    \MTr@adjustdistance{i}{ii}%
-%%%    \MTr@setparentdimens{i}{ii}%
-%    \end{macrocode}
-% Adjust children's $x$ to include "morex", 
-%    \begin{macrocode}
-%%%    \advance\MTr@childix\MTr@morex%
-%%%    \advance\MTr@childiix\MTr@morex%
 %    \end{macrocode}
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
@@ -954,18 +935,6 @@
 %    \begin{macrocode}
 \def\MTr@outputthreechildren{%
 %    \end{macrocode}
-% Calculate desired distance between the three children.
-% The cumulative value is put into "treev". Next, set dimensions for the
-% label.
-%    \begin{macrocode}
-    \MTr@adjustdistance{i}{ii}%
-    \MTr@adjustdistance{ii}{iii}%
-%%%    \MTr@setparentdimens{i}{iii}%
-%%%    \advance\MTr@childix\MTr@morex%
-%%%    \advance\MTr@childiix\MTr@morex%
-%%%    \advance\MTr@childparam{iii}{x}\MTr@morex%
-%    \end{macrocode}
-%
 % Set various other parameters, draw the children.
 %    \begin{macrocode}
     \MTr@outputchildren{3}%
@@ -977,10 +946,22 @@
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
 %    \end{macrocode}
+% Calculate desired distance between the children.
+% The cumulative value is put into "treev".
 %    \begin{macrocode}
-    \MTr@loopcnta #1
-    \loop
-    \advance \MTr@loopcnta by -1 \ifnum\MTr@loopcnta>0 \repeat
+    \ifnum#1>1
+      \MTr@loopcnta 1
+      \loop
+	\edef\MTr@temp{\romannumeral\MTr@loopcnta}%
+	\ifnum\MTr@loopcnta<#1
+	  \advance \MTr@loopcnta by 1
+	  \MTr@adjustdistance{\MTr@temp}{\romannumeral\MTr@loopcnta}%
+      \repeat
+    \fi
+%    \end{macrocode}
+% Calculate the subtree's $v$ and $w$, based on the children, and the
+% label's width.
+%    \begin{macrocode}
     \MTr@setparentdimens{i}{\romannumeral#1}%
 %    \end{macrocode}
 % After the call to "setparentdimens", all children's $x$
