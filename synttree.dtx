@@ -925,21 +925,9 @@
 %    \begin{macrocode}
     \MTr@picheight\MTr@childipicheight%
 %    \end{macrocode}
-% Set various other parameters.
+% Set various other parameters, draw the children.
 %    \begin{macrocode}
-    \MTr@setpictureparameters%
-%    \end{macrocode}
-% Start the picture, draw the label, the single child, and the line to the
-% child, and end the picture.
-%    \begin{macrocode}
-    \begin{picture}%
-          (\MTr@picwidth,\MTr@picheight)%
-          (0,-\MTr@picheight)%
-      %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
-      \MTr@drawlabel%
-      \MTr@drawchild{i}%
-      \MTr@drawchildline{i}
-    \end{picture}%
+    \MTr@outputchildren{1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -974,21 +962,9 @@
       \MTr@picheight\MTr@childiipicheight%
     \fi%
 %    \end{macrocode}
-% Set various other parameters.
+% Set various other parameters, draw the children.
 %    \begin{macrocode}
-    \MTr@setpictureparameters%
-%    \end{macrocode}
-% Start the picture, draw the label, the children, and the lines to the
-% children, and end the picture.
-%    \begin{macrocode}
-    \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
-      %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
-      \MTr@drawlabel%
-      \MTr@drawchild{i}
-      \MTr@drawchildline{i}
-      \MTr@drawchild{ii}
-      \MTr@drawchildline{ii}
-    \end{picture}%
+    \MTr@outputchildren{2}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1026,21 +1002,24 @@
       \MTr@picheight\MTr@childiiipicheight%
     \fi%
 %    \end{macrocode}
-% Set various other parameters.
+% Set various other parameters, draw the children.
 %    \begin{macrocode}
-    \MTr@setpictureparameters%
-%    \end{macrocode}
-% Start the picture, draw the label, the children, and the lines to the
-% children, and end the picture.
-%    \begin{macrocode}
-      \MTr@outputchildren{3}%
+    \MTr@outputchildren{3}%
 }
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\MTr@outputchildren}
-% Common code for any number of children.
+% Common code for any number of children:
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
+%    \end{macrocode}
+% Set various other parameters.
+%    \begin{macrocode}
+  \MTr@setpictureparameters%
+%    \end{macrocode}
+% Start the picture, draw the label, the children, and the lines to the
+% children, and end the picture.
+%    \begin{macrocode}
   \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
     %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
     \MTr@drawlabel%
