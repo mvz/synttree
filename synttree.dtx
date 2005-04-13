@@ -839,13 +839,13 @@
     \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}
   \fi
   \ifnum\MTr@numchildren=1%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputonechild}
+    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{1}}
   \fi
   \ifnum\MTr@numchildren=2%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputtwochildren}
+    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{2}}
   \fi
   \ifnum\MTr@numchildren>2%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputthreechildren}
+    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{3}}
   \fi
   \ifnum\MTr@numchildren>3%
     \typeout{synttree Warning: Ignoring extra children in output.}%
@@ -906,41 +906,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \begin{macro}{\MTr@outputonechild}
-% Output label and one child.
-%    \begin{macrocode}
-\def\MTr@outputonechild{%
-%    \end{macrocode}
-% Set various other parameters, draw the children.
-%    \begin{macrocode}
-    \MTr@outputchildren{1}%
-}
-%    \end{macrocode}
-% \end{macro}
 %
-% \begin{macro}{\MTr@outputtwochildren}
-% Two children.
-%    \begin{macrocode}
-\def\MTr@outputtwochildren{%
-%    \end{macrocode}
-% Set various other parameters, draw the children.
-%    \begin{macrocode}
-    \MTr@outputchildren{2}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\MTr@outputthreechildren}
-% Three children.
-%    \begin{macrocode}
-\def\MTr@outputthreechildren{%
-%    \end{macrocode}
-% Set various other parameters, draw the children.
-%    \begin{macrocode}
-    \MTr@outputchildren{3}%
-}
-%    \end{macrocode}
-% \end{macro}
 % \begin{macro}{\MTr@outputchildren}
 % Common code for any number of children:
 %    \begin{macrocode}
