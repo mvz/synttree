@@ -1,4 +1,4 @@
-%% \CheckSum{806}
+%% \CheckSum{777}
 % \iffalse meta-comment
 %% synttree.dtx 
 %% Package `synttree' for use with LaTeX 2e
@@ -77,27 +77,27 @@
 %
 %  The "synttree" package provides a macro for creating syntactic tree
 %  structures such as those used in Noam Chomsky's Generative Grammar.
-%  It is designed to create a tree that looks nice, with as little use
-%  of `special effects', such as PostScript, as possible.
-%
-%  The current implementation can use either em\TeX{} "\special"'s or
-%  \LaTeXe{}'s "\qbezier" macro to draw the lines in the tree,
-%  although the latter option is probably not very nice. The behavior
-%  defaults to the \LaTeXe{} version.
+%  It is designed to create a tree that looks nice, without manual
+%  tweaking, and with as little use of `special effects', such as
+%  PostScript, as possible.
 %
 %  Since the application is very specific, there is no need for a very
-%  complex drawing algorithm. A more complex package is the TreeTeX
-%  system \cite{TreeTeX}. This system, however, produces nodes
-%  consisting of a node symbol \emph{and} a label, whereas in
-%  syntactic trees the label \emph{is} the node symbol. Additionally,
-%  the method of specifying the tree structure itself makes the source
-%  code hard to read.
+%  complex set of options. "synttree" is designed to do one thing, and do
+%  it well.
+%
+%  The current version adds support for an unlimited number of branches.
 %
 %  \section{Usage}
 %
-%  \subsection{Package Options}
+%  \subsection{Drawing Options}
 %
-%  The following options are supported:
+% The current implementation can use either em\TeX{} "\special"'s or
+% \LaTeXe{}'s "\qbezier" macro to draw the lines in the tree,
+% although the latter option is probably not very nice. The behavior
+% defaults to the \LaTeXe{} version.
+%
+%  In order to switch between the two modes, the following options are
+%  supported:
 %
 %  \begin{description}
 %
@@ -109,39 +109,17 @@
 %
 %  \subsection{Defined Macros}
 %
+%  \DescribeMacro{\synttree}
 %  The main macro defined by this package is the "\synttree" macro. It
 %  takes as arguments first an optional parameter indicating the
-%  maximum level of the tree, and second a parameter describing the
-%  structure of the tree. Levels are surrounded by "[" and "]".
+%  maximum depth of the tree, and second a parameter describing the
+%  structure of the tree, delimited by square brackets ("[" and "]").
 %
-%  Within a level, first, parameters may be added. These are specified
-%  by appending a "." to the opening bracket, and appending letters
-%  that modify the appearance of the next level. Append a "t" to
-%  create a triangle instead of a line going from the label to the
-%  level above it, and a "b" to specify that the node has to appear at
-%  the bottom of the tree, on a line with the outermost branches. To
-%  use "b", a maximum tree depth has to be specified. To combine the
-%  two features, use "x".
-%
-%  Then, the label follows. If spaces are included in the label, surround
-%  them (or the entire label) by braces, or use "~". After the label, the
-%  node's children follow. They are of course surrounded by brackets. No
-%  words may appear between the children.
-%
-%  The distance between levels can be adjusted by using
-%  "\branchheight". It takes a length as its argument, and sets the
-%  distance to that length. Default is half an inch.
-%
-%  The balancing of the triangles can be adjusted by using
-%  "\trianglebalance". It takes a number from 0 to 100, indicating the
-%  percentage of the triangle on the right side of its attachment point to
-%  the parent.
-%
-%  \subsection{Examples}
-%
-%  As a simple example, the line
+%  A tree consists of the parent node's label, followed by the child trees.
+%  Each of the child trees is again surrounded by square brackets.
+%  For example, the line
 %\begin{verbatim}
-%  \synttree[A[B][C]]
+%\synttree[A[B][C]]
 %\end{verbatim}
 %  creates the following tree:
 % \begin{trivlist}
@@ -151,39 +129,91 @@
 %  Note that leading and trailing spaces in the label will be ignored, so
 %  the following has the same result:
 %\begin{verbatim}
-%  \synttree[ A [ B ][ C ]]
+%\synttree[ A [ B ][ C ]]
 %\end{verbatim}
+%^^A  Nodes and subtrees are surrounded by square
+%^^A  brackets ("[" and "]"), as is the entire tree.
 %
-%  Using the optional parameters, the line
+%  Before the label, a parameter may be added. This is specified
+%  by appending a period (".") to the opening bracket, and appending a letter
+%  that modifies the appearance of the tree. Append a "t" to
+%  create a triangle instead of a line going from the label to the
+%  level above it, and a "b" to specify that the node has to appear at
+%  the bottom of the tree, on a line with the lowest leaves. To
+%  use "b", a maximum tree depth has to be specified. To combine the
+%  two features, use "x".
+%
+%  Using the optional parameters, the code
 %\begin{verbatim}
-%  \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
+%\synttree{4}
+%[A
+%  [B [.x Some text] ]
+%  [D [E] [F[.t G]] [H] ]
+%]
 %\end{verbatim}%
 %  creates this tree:
 % \begin{trivlist}
-%  \item \synttree{4}[A[B[.x {Some text}]][D[E][F[.t G]][H]]]
+%  \item
+% \synttree{4}
+% [A
+%   [B [.x Some text] ]
+%   [D [E] [F[.t G]] [H] ]
+% ]
 % \end{trivlist}
 %
+%  If brackets are included in the label, surround
+%  them (or the entire label) by braces:
+%
+%\begin{verbatim}
+%  \synttree[A[{B]D}][C]]
+%\end{verbatim}
+% \begin{trivlist}
+%  \item \synttree[
+%      A[{B]D}][C]]
+% \end{trivlist}
+%
+%  \DescribeMacro{\branchheight}
+%  The distance between levels can be adjusted by using
+%  "\branchheight". It takes a length as its argument, and sets the
+%  distance to that length. Default is half an inch.
+%
+%  \DescribeMacro{\trianglebalance}
+%  The balancing of the triangles can be adjusted by using
+%  "\trianglebalance". It takes a number from 0 to 100, indicating the
+%  percentage of the triangle on the right side of its attachment point to
+%  the parent. The default is 50.
+%
+% \DescribeMacro{\childsidesep} Minimum separation between edges of two
+% children. Default is "1em".
+%
+% \DescribeMacro{\childattachsep}How far apart are the attachment points of
+% two children? Default is "0.5in".
 %
 %  \section{Wish List and Bugs}
 %
+%  This package may not prevent you from doing certain things `wrong'.
+%  For example, triangles on non-leaf nodes are not forbidden, but do not
+%  give the desired result.
+%
 % I hope to add the following features sooner or later:
 % \begin{itemize}
-%   \item A larger number of children. The current limit is three. Ideally,
-%   any arbitrary number of children will be supported.
-%   \item Control over other parameters affecting the `look' of the tree.
 %   \item The possibility of `sinking' the tree on the current line,
 %   so that the top label aligns with the other text, instead of the
 %   bottom label.
 %   \item The possibility of creating trees within trees.
 % \end{itemize}
 %
-%  \section{Known Bugs}
-% Triangles on non-leaf nodes are not forbidden, but do not give the
-% desired result.
+%  \section{Related Packages}
+%  A more complex package is the TreeTeX
+%  system\cite{TreeTeX}. This system, however, produces nodes
+%  consisting of a node symbol \emph{and} a label, whereas in
+%  syntactic trees the label \emph{is} the node symbol. Additionally,
+%  the method of specifying the tree structure itself makes the source
+%  code hard to read.
 %
 %  \section{Author and License}
 %
-% Copyright (c) 1998, 1999, 2001, 2004 Matijs van Zuijlen.
+% Copyright (c) 1998, 1999, 2001, 2004, 2005 Matijs van Zuijlen.
 %
 % The "synttree" package is free software. It has been released under the
 % terms of the Latex Project Public License, version 1.3a. 
@@ -358,7 +388,7 @@
 \newcount\MTr@picwidth
 \newcount\MTr@picheight
 %    \end{macrocode}
-% Finally, we need a temporary length, and three temporary counters.
+% Finally, we need a temporary length, and four temporary counters.
 %    \begin{macrocode}
 \newlength{\MTr@templength}
 \newcount\MTr@loopcnta
@@ -368,8 +398,9 @@
 %    \end{macrocode}
 %
 % \subsection{Adjustable and other parameters}
+% \begin{macro}{\branchheight}
 % The user can set up several parameters.
-% First,\begin{macro}{\branchheight} "\branchheight" will set the distance
+% First, "\branchheight" will set the distance
 % between levels. Default value is half an inch.
 % ^^A TODO: let default value depend on font size.
 %    \begin{macrocode}
@@ -508,8 +539,9 @@
 }
 %    \end{macrocode}
 % \end{macro}
-%^^A TODO: Maybe this can be done simpler by using \futurelet in some way.
 % \begin{macro}{\Mtr@parsedot}
+% Parse the optional node argument.
+% (TODO: Maybe this can be done simpler by using "\futurelet" in some way.)
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{
   \ifx:#2
@@ -524,6 +556,11 @@
     \MTr@parsedot#3\END
   \fi
 }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\Mtr@setlabel}
+% Store the tree's label in a box.
+%    \begin{macrocode}
 \def\MTr@setlabel#1 #2\END{
   \if\space#1
   \else
@@ -575,8 +612,7 @@
 % \end{macro}
 % \begin{macro}{\MTr@savecurrentchildbox}
 % Save the current picture, with all its data, in the box and registers for
-% the next empty child. Basically, we just copy from the tree registers to
-% the child registers, except $x$ is set to $v$ initially.
+% the next empty child.
 %    \begin{macrocode}
 \def\MTr@savecurrentchildbox{%
   \advance\MTr@numchildren by 1
@@ -591,6 +627,14 @@
     \fi
   \fi
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\MTr@savechildbox}
+% Save current tree in a specific child box. Basically, we just copy from
+% the tree registers to the child registers, except $x$ is set to $v$
+% initially. Used only in "\MTr@savecurrentchildbox". 
+%    \begin{macrocode}
 \def\MTr@savechildbox#1{%
   \expandafter
   \ifx\csname MTr@child#1box\endcsname\relax%
@@ -623,17 +667,6 @@
 % \begin{macro}{\MTr@bottomnodetrue}
 % The node is a bottom node. Calculate the difference between this
 % level and the bottom level as passed to "\synttree", and use this to
-% \begin{macro}{\MTr@drawchild}
-%    \begin{macrocode}
-\def\MTr@drawchild#1{%
-  \MTr@tempcnta\MTr@childparam{#1}{x}
-  \advance\MTr@tempcnta-\MTr@childparam{#1}{v}
-  \put(\MTr@tempcnta,\MTr@childparam{#1}{y}){%
-    \makebox(0,0)[tl]{%
-      \usebox{\csname MTr@child#1box\endcsname}}}%
-}
-%    \end{macrocode}
-% \end{macro}
 % determine how many levels the node has to be advanced vertically to
 % get it at the correct position. In effect, the distance between two
 % levels is multiplied by the ``branch multiplication.'' For
@@ -844,7 +877,7 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\MTr@outputlabel}
-% Output just the label.
+% Output a tree that is just a label, with no children.
 %    \begin{macrocode}
 \def\MTr@outputlabel{%
 %    \end{macrocode}
@@ -892,7 +925,7 @@
 % \end{macro}
 %
 % \begin{macro}{\MTr@outputchildren}
-% Common code for any number of children:
+% Output a tree or subtree with at least one child tree.
 %    \begin{macrocode}
 \def\MTr@outputchildren#1{%
 %    \end{macrocode}
@@ -915,9 +948,9 @@
     \MTr@setparentdimens{i}{\romannumeral#1}%
 %    \end{macrocode}
 % After the call to "setparentdimens", all children's $x$
-% values must be advanced by "morex"
-% Set vertical position and picture height for all children.
-% Height is the height of the largest child.
+% values must be advanced by "morex". In the same loop, also
+% set vertical position and picture height for each child.
+% The height of the picture is the height of the largest child.
 %    \begin{macrocode}
     \MTr@picheight 0%
     \MTr@loopcnta #1
@@ -934,8 +967,8 @@
 %    \begin{macrocode}
   \MTr@setpictureparameters%
 %    \end{macrocode}
-% Start the picture, draw the label, the children, and the lines to the
-% children, and end the picture.
+% Start the picture and draw the label. Next, draw each child, and the line
+% to that child. Then, end the picture.
 %    \begin{macrocode}
   \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
     %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
