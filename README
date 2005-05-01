@@ -1,6 +1,6 @@
       The synttree package for typesetting syntactic trees
 
-      Version 1.3.1
+      Version 1.4
 
 The "synttree" package provides a simple way to typeset syntactic trees as
 used in Chomsky's Generative Grammar.
