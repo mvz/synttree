@@ -1,8 +1,8 @@
-%% \CheckSum{777}
+%% \CheckSum{774}
 % \iffalse meta-comment
 %% synttree.dtx 
 %% Package `synttree' for use with LaTeX 2e
-%% Version 1.3.1
+%% Version 1.4
 % 
 % See the section "Author and License" below for copyright and licensing
 % information 
@@ -38,6 +38,8 @@
 % 1.3.1	    2004/11/07	Prepared for packaging, clarified licensing.
 %      	    2004/12/30	Ignore leading and trailing spaces in labels.
 %	    2005/04/13	Allow up to 10 children (or any number, in theory).
+% 1.4	    2005/05/01	Allow any number of children, just warn.
+%			Updated documentation.
 %
 %<*driver>
 \documentclass[a4paper]{ltxdoc}
@@ -46,7 +48,7 @@
  %\DisableCrossrefs     % Say \DisableCrossrefs if index is ready
 \CodelineIndex
 \RecordChanges          % Gather update information
- \OnlyDescription      % comment out for implementation details
+ %\OnlyDescription      % comment out for implementation details
  \OldMakeindex         % use if your MakeIndex is pre-v2.9
 \setlength\hfuzz{15pt}  % dont make so many
 \hbadness=7000          % over and under full box warnings
@@ -58,7 +60,7 @@
 %\fi
 %\MakeShortVerb{\"} 
 % \title{The "synttree" package for typesetting syntactic
-% trees.\footnote{Package version 1.3.1}}
+% trees.\footnote{Package version 1.4}}
 % \author{Matijs van Zuijlen\footnote{e-mail: \texttt{mvz@xs4all}; web:
 % \texttt{http://www.matijs.net/}}}
 %
@@ -82,7 +84,7 @@
 %  PostScript, as possible.
 %
 %  Since the application is very specific, there is no need for a very
-%  complex set of options. "synttree" is designed to do one thing, and do
+%  complex set of options: "synttree" is designed to do one thing, and do
 %  it well.
 %
 %  The current version adds support for an unlimited number of branches.
@@ -116,6 +118,9 @@
 %  structure of the tree, delimited by square brackets ("[" and "]").
 %
 %  A tree consists of the parent node's label, followed by the child trees.
+%  In principle, an unlimited number of children can be specified, but
+%  to signal runaway trees, a warning will be issued when the number is
+%  more than ten.
 %  Each of the child trees is again surrounded by square brackets.
 %  For example, the line
 %\begin{verbatim}
@@ -172,44 +177,44 @@
 %      A[{B]D}][C]]
 % \end{trivlist}
 %
+%  The other defined macros affect the look and sizing of the trees.
 %  \DescribeMacro{\branchheight}
 %  The distance between levels can be adjusted by using
 %  "\branchheight". It takes a length as its argument, and sets the
-%  distance to that length. Default is half an inch.
-%
+%  distance to that length. The default distance is half an inch. This
+%  value is the distance between the baselines of the labels, so setting it
+%  to zero will cause everything to be on one line.
+%  \DescribeMacro{\childsidesep}
+%  The minimum horizontal separation between edges of two children is set
+%  by "\childsidesep". The default is "1em".
+%  \DescribeMacro{\childattachsep}
+%  The length "\childattachsep" indicates the minimum distance between the
+%  attachment points of two children. Here, the default is "0.5in".
 %  \DescribeMacro{\trianglebalance}
-%  The balancing of the triangles can be adjusted by using
+%  Finally, the balancing of the triangles can be adjusted by using
 %  "\trianglebalance". It takes a number from 0 to 100, indicating the
 %  percentage of the triangle on the right side of its attachment point to
-%  the parent. The default is 50.
-%
-% \DescribeMacro{\childsidesep} Minimum separation between edges of two
-% children. Default is "1em".
-%
-% \DescribeMacro{\childattachsep}How far apart are the attachment points of
-% two children? Default is "0.5in".
+%  the parent. The default is 50, resulting in isosceles triangles.
 %
 %  \section{Wish List and Bugs}
 %
-%  This package may not prevent you from doing certain things `wrong'.
-%  For example, triangles on non-leaf nodes are not forbidden, but do not
-%  give the desired result.
+%  It is important to note that this package may not prevent you from doing
+%  certain things `wrong'. For example, triangles on non-leaf nodes are
+%  not forbidden, but may not give the desired result.
 %
-% I hope to add the following features sooner or later:
-% \begin{itemize}
-%   \item The possibility of `sinking' the tree on the current line,
-%   so that the top label aligns with the other text, instead of the
-%   bottom label.
-%   \item The possibility of creating trees within trees.
-% \end{itemize}
+%  Sometimes, the label of a parent may be a phrase, and it may be
+%  desirable to attach the children to a particular element in that phrase
+%  (e.g., to elaborate on the structure of that particular element).  This
+%  is currently not possible: The children are always attached to the
+%  center of the label. Support for this may be added sooner or later.
 %
-%  \section{Related Packages}
-%  A more complex package is the TreeTeX
-%  system\cite{TreeTeX}. This system, however, produces nodes
-%  consisting of a node symbol \emph{and} a label, whereas in
-%  syntactic trees the label \emph{is} the node symbol. Additionally,
-%  the method of specifying the tree structure itself makes the source
-%  code hard to read.
+%^^A  \section{Related Packages}
+%^^A  A more complex package is the TreeTeX
+%^^A  system\cite{TreeTeX}. This system, however, produces nodes
+%^^A  consisting of a node symbol \emph{and} a label, whereas in
+%^^A  syntactic trees the label \emph{is} the node symbol. Additionally,
+%^^A  the method of specifying the tree structure itself makes the source
+%^^A  code hard to read.
 %
 %  \section{Author and License}
 %
@@ -620,11 +625,10 @@
     \typeout{synttree internal warning: There is no child box to save.}%
   \else
     \ifnum\MTr@numchildren>10%
-      \typeout{synttree warning: I can save at most 10 child boxes.}%
-      \advance\MTr@numchildren by -1
-    \else
-      \MTr@savechildbox{\romannumeral\MTr@numchildren}%
+      \typeout{synttree warning: More than 10 child boxes.
+      Can this be true?}%
     \fi
+    \MTr@savechildbox{\romannumeral\MTr@numchildren}%
   \fi
 }
 %    \end{macrocode}
