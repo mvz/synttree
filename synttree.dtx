@@ -48,7 +48,7 @@
  %\DisableCrossrefs     % Say \DisableCrossrefs if index is ready
 \CodelineIndex
 \RecordChanges          % Gather update information
- \OnlyDescription      % comment out for implementation details
+ %\OnlyDescription      % comment out for implementation details
  \OldMakeindex         % use if your MakeIndex is pre-v2.9
 \setlength\hfuzz{15pt}  % dont make so many
 \hbadness=7000          % over and under full box warnings
@@ -178,20 +178,22 @@
 % \end{trivlist}
 %
 %  The other defined macros affect the look and sizing of the trees.
-%  \DescribeMacro{\branchheight}
 %  The distance between levels can be adjusted by using
+%  \DescribeMacro{\branchheight}
 %  "\branchheight". It takes a length as its argument, and sets the
 %  distance to that length. The default distance is half an inch. This
 %  value is the distance between the baselines of the labels, so setting it
 %  to zero will cause everything to be on one line.
-%  \DescribeMacro{\childsidesep}
 %  The minimum horizontal separation between edges of two children is set
-%  by "\childsidesep". The default is "1em".
+%  by
+%  \DescribeMacro{\childsidesep}
+%  "\childsidesep". The default is "1em".
+%  The length
 %  \DescribeMacro{\childattachsep}
-%  The length "\childattachsep" indicates the minimum distance between the
+%  "\childattachsep" indicates the minimum distance between the
 %  attachment points of two children. Here, the default is "0.5in".
-%  \DescribeMacro{\trianglebalance}
 %  Finally, the balancing of the triangles can be adjusted by using
+%  \DescribeMacro{\trianglebalance}
 %  "\trianglebalance". It takes a number from 0 to 100, indicating the
 %  percentage of the triangle on the right side of its attachment point to
 %  the parent. The default is 50, resulting in isosceles triangles.
@@ -208,13 +210,21 @@
 %  is currently not possible: The children are always attached to the
 %  center of the label. Support for this may be added sooner or later.
 %
-%^^A  \section{Related Packages}
-%^^A  A more complex package is the TreeTeX
-%^^A  system\cite{TreeTeX}. This system, however, produces nodes
-%^^A  consisting of a node symbol \emph{and} a label, whereas in
-%^^A  syntactic trees the label \emph{is} the node symbol. Additionally,
-%^^A  the method of specifying the tree structure itself makes the source
-%^^A  code hard to read.
+%  \section{Related Packages}
+%  A more complex package is the TreeTeX
+%  system\cite{TreeTeX}. This system, however, produces nodes
+%  consisting of a node symbol \emph{and} a label, whereas in
+%  syntactic trees the label \emph{is} the node symbol. Additionally,
+%  the method of specifying the tree structure itself makes the source
+%  code hard to read.
+%
+%  The "xyling" package\cite{xyling} is a very powerful package, allowing
+%  many things that "synttree" will not do. However, the nodes have to be
+%  laid out meticulously in an array. Once that's done, however, the result
+%  looks very good.
+%
+%  The ``\LaTeX\ for Linguists'' website\cite{LfL} lists other tree-drawing
+%  packages, with comments on their usefulness.
 %
 %  \section{Author and License}
 %
@@ -229,12 +239,18 @@
 %
 % \StopEventually{
 %  \begin{thebibliography}{1}
+%  \bibitem{LfL} Doug Arnold
+%  \newblock {\it \LaTeX\ for Linguists} \\
+%  \newblock {At \texttt{http://www.essex.ac.uk/linguistics/clmt/latex4ling/}}
 %  \bibitem{TreeTeX} A. Br{\"u}ggemann-Klein and D. Wood.
 %  \newblock {\it Drawing trees nicely with \TeX{}}
-%  \newblock {File \texttt{tree\_doc.tex}}
+%  \newblock {File \texttt{tree\_doc.tex} in the "treetex" package}
 %  \bibitem{BasicControl} Jonathan Fine.
 %  \newblock {\it Some Basic Control Macros for \TeX{}}
 %  \newblock {TUGboat, Volume 13 (1992), No. 1}
+%  \bibitem{xyling} Ralf Vogel
+%  \newblock {\it xyling --- \LaTeX\ macros for linguistic graphics} \\
+%  \newblock {At \texttt{http://www.ling.uni-potsdam.de/~rvogel/xyling/}}
 %  \end{thebibliography}
 % }
 %
@@ -546,7 +562,7 @@
 % \end{macro}
 % \begin{macro}{\Mtr@parsedot}
 % Parse the optional node argument.
-% (TODO: Maybe this can be done simpler by using "\futurelet" in some way.)
+%^^ATODO: Maybe this can be done simpler by using "\futurelet" in some way.
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{
   \ifx:#2
