@@ -1,29 +1,75 @@
 \documentclass{article}
 \usepackage{synttree}
 \begin{document}
-A sentence.
 \childattachsep{0.6in} 
 \childsidesep{0.9em}
-Another one.
 
-    \synttree[A[ A    ]] % single child, no label issues
+\title{Synttree test cases}
+\author{Matijs van Zuijlen}
+\maketitle
 
-    \synttree[ A [ AA ]] % single child, bottom label is wider
+\section{Basic}
 
-    \synttree[AA[A]] % single child, top label is wider
+These are test cases for synttree.
 
-    \synttree[A[.t AA]] % single child, triangle
+All cases are left-aligned. Their
+leftmost border should be on the same vertical as the start of this
+paragraph.
 
-    \synttree[A[ b a a    a a a b][D]]
+    \synttree[A[ A    ]] \hfill Single child, no label issues
+
+    \synttree[ A [ AA ]] \hfill single child, bottom label is wider
+
+    \synttree[AA[A]] \hfill single child, top label is wider
+
+    \synttree[A[.t AA]] \hfill single child, triangle
+
+    \synttree[A[ b a a    a a a b][D]] \hfill Spaces in label are
+    handled like regular \TeX.
 
     \synttree[A[aa a a a a a aa [E][.t FFFFFFFF]][D[.t ZZ]]]
-    % with some triangles, slightly weird.
+    \hfill with some triangles, slightly weird.
 
-    \synttree[A[B][C][D]] % three children
+    \synttree[A[B][C][D]] \hfill three children
 
-    \synttree[A[B][C][D][E]] % four children
+    \synttree[A[B][C][D][E]] \hfill four children
 
-    \synttree[A[B][C][D][E][F][G][H][I][J][K][L][M]] % 12 children
+    \synttree[A[B][C][D][E][F][G][H][I][J][K][L][M]]
+    
+    \hfill 12 children
 
-    \synttree{4}[A[B[E[F]][C]][D[.b Z]]]
+    \synttree{4} [A[B[E[F]][C]][D[.b Z]]]
+    \hfill With a bottom node
+
+    \synttree[A[
+      \shortstack{\strut B \\ \strut (C)}
+      [D(E)]]] \hfill Big label
+
+\newpage
+
+\section{Boxes and size}
+    Start\fbox{1\synttree[A]2}End
+
+    $\left\{\fbox{\synttree [A]}\right\}$
+
+    %Start\mbox{a\synttree[A[ A    ]]b}End
+
+    %Start\mbox{\synttree[ A [ AA ]]}End
+
+\iffalse
+\section{Two}
+
+Special cases.
+
+a\synttree{4} [A[B[E[F]][C]][D[.b Z]]]b
+
+\mbox{a\synttree{4} [A[B[E[F]][C]][D[.b Z]]]b}
+    \hfill Big brackets.
+
+$\left\{1+\mbox{\synttree{4} [A[B[E[F]][C]][D[.b Z]]]}-2\right\}$
+    \hfill Big brackets.
+
+$\left\{1+\fbox{\synttree [A[B[E[F]][C]][D[Z]]]}-2\right\}$
+    \hfill Big brackets.
+    \fi
 \end{document}

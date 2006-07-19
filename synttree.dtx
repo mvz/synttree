@@ -265,6 +265,11 @@
 \def\@AfterElseFi#1\else#2\fi{\fi#1}
 %    \end{macrocode}
 %
+% String comparison\cite{TexByTopic}.
+%    \begin{macrocode}
+\def\@IfEqString#1#2{\def\tempa{#1}\def\tempb{#2}\ifx\tempa\tempb}
+%    \end{macrocode}
+%
 % \subsection{Drawing commands}
 %
 % These command are used to draw the lines between the nodes. There are two
@@ -508,13 +513,14 @@
   \MTr@level=0%
   \MTr@numchildren=0%
   \MTr@uselabelfalse%
+  {}a{}%
   \MTr@parserightbracket%
 }
 %    \end{macrocode}
 % \end{macro}
 %
 % \subsection{Parsing}
-% \iffalse[[[\fi^^A Brackets needed for bracket balancing
+% \iffalse[[[\fi^^A Brackets needed for bracket balancing in text editor
 %
 % Parsing will only work if at least one "]" is present.
 % \begin{macro}{\MTr@parserightbracket}
@@ -525,11 +531,16 @@
 % "]".
 %    \begin{macrocode}
 \def\MTr@parserightbracket#1]{%
+  {}l{}%
   \MTr@parseleftbracket#1[:\END%
+  {}p{}%
   \advance\MTr@level by -1%
+  {}m{}%
   \MTr@dorightbracket%
+  {}n{}%
   \ifnum\MTr@level=0%
-    \unhbox\MTr@childibox%
+    \typeout{Width: \the\MTr@treew \the\MTr@treev}%
+    \unhbox\MTr@childibox{}z%
   \else
     \@AfterFi{\MTr@parserightbracket}%
   \fi%
@@ -549,10 +560,12 @@
   \ifMTr@uselabel%
     \MTr@bottomnodefalse%
     \MTr@mytrianglefalse%
+    {}E{}%
     \MTr@parsedot#1.: \END%
+    {}F{}%
   \fi%
-  \ifx:#2
-  \else
+  \ifx:#2%
+  \else%
     \MTr@doleftbracket%
     \advance\MTr@level by 1%
     \@AfterFi{\MTr@parseleftbracket#2\END}%
@@ -564,10 +577,12 @@
 % Parse the optional node argument.
 %^^ATODO: Maybe this can be done simpler by using "\futurelet" in some way.
 %    \begin{macrocode}
-\def\MTr@parsedot#1.#2 #3\END{
-  \ifx:#2
-    \setbox\MTr@labelbox\hbox{}
-    \MTr@setlabel #1 \END
+\def\MTr@parsedot#1.#2 #3\END{%
+  \ifx:#2%
+    \setbox\MTr@labelbox\hbox{}%
+  {}G{}%
+    \MTr@setlabel #1 \END%
+  {}H{}%
   \else
     \ifx#2b\MTr@bottomnodetrue\else%
     \ifx#2x\MTr@bottomnodetrue\MTr@mytriangletrue\else%
@@ -582,19 +597,21 @@
 % \begin{macro}{\Mtr@setlabel}
 % Store the tree's label in a box.
 %    \begin{macrocode}
-\def\MTr@setlabel#1 #2\END{
-  \if\space#1
+\def\MTr@setlabel#1 #2\END{%
+  \@IfEqString{\space}{#1}\relax
   \else
-    \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox #1}
-  \fi
+    \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox #1}%
+  \fi%
+  %TODO{}K{}%
   \if\space#2
+  %TODO{}M{}%
   \else
     \if\space#1
     \else
       \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{} }
     \fi
     \MTr@setlabel#2\END
-  \fi
+  \fi%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -624,10 +641,13 @@
 % ^^A TODO: Put this back into parserightbracket.
 %    \begin{macrocode}
 \def\MTr@dorightbracket{%
+  {}A{}%
   \MTr@maketreebox%
+  {}B{}%
   \egroup%
   \MTr@uselabelfalse%
   \MTr@savecurrentchildbox%
+  {}C{}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -881,12 +901,11 @@
   \MTr@labelhalfwidth\wd\MTr@labelbox%
   \divide\MTr@labelhalfwidth 2%
   \ifnum\MTr@numchildren=0%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}
-  \fi
+    \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}%
+  \fi%
   \ifnum\MTr@numchildren>0%
     \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{\the\MTr@numchildren}}%
-  \fi
-
+  \fi%
   \global\MTr@branchmult\MTr@mybranchmult%
   \ifMTr@mytriangle%
     \global\MTr@triangletrue%
@@ -931,10 +950,11 @@
 % picture, its baseline aligned with the bottom of the picture.
 %    \begin{macrocode}
     \advance\MTr@picheight\MTr@treedepth%
+    \typeout{Starting label picture: \the\MTr@picwidth, \the\MTr@picheight}%
     \begin{picture}%
         (\MTr@picwidth,\MTr@picheight)%
         (-\MTr@treev,-\MTr@picheight)%
-      %\put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+      \put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \put(-\MTr@treev,0){%
         \makebox(0,0)[tl]{%
           \rule{0pt}{\MTr@minheight}%
@@ -990,8 +1010,9 @@
 % Start the picture and draw the label. Next, draw each child, and the line
 % to that child. Then, end the picture.
 %    \begin{macrocode}
+  \typeout{Starting picture: \the\MTr@picwidth, \the\MTr@picheight}%
   \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
-    %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+    \put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
     \MTr@drawlabel%
     \MTr@loopcnta #1
     \loop
