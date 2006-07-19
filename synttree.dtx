@@ -267,7 +267,7 @@
 %
 % String comparison\cite{TexByTopic}.
 %    \begin{macrocode}
-\def\@IfEqString#1#2{\def\tempa{#1}\def\tempb{#2}\ifx\tempa\tempb}
+\def\ifEqString#1#2{\def\tempa{#1}\def\tempb{#2}\ifx\tempa\tempb\relax}
 %    \end{macrocode}
 %
 % \subsection{Drawing commands}
@@ -595,23 +595,45 @@
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\Mtr@setlabel}
-% Store the tree's label in a box.
+% Store the tree's label in a box. This convoluted macro is needed to strip
+% spaces off of the beginning and and of a label. Suggestions for
+% improvement are welcome!
 %    \begin{macrocode}
-\def\MTr@setlabel#1 #2\END{%
-  \@IfEqString{\space}{#1}\relax
+\def\MTr@setlabel #1 #2\END{%
+  \typeout{Number 2: <#2>}
+  \typeout{Number 1: <#1>}
+  \typeout{----------------}
+  \relax
+  %\MTr@setlabelblockone{#1}
+  \def\tempempty{}
+  \def\tempspace{ }
+  \def\tempa{#1}
+  \def\tempb{#2}
+  \ifx\tempempty\tempa\relax% Arg 1 is empty
+    \typeout{A}%
   \else
+    \typeout{B}%
     \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox #1}%
   \fi%
-  %TODO{}K{}%
-  \if\space#2
-  %TODO{}M{}%
+  \typeout{C}%
+  \ifx\tempempty\tempb% Arg 2 is empty
+    \typeout{D}%
   \else
-    \if\space#1
+    \ifx\tempspace\tempb% Arg 2 is a space
+      \typeout{E}%
     \else
-      \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{} }
-    \fi
-    \MTr@setlabel#2\END
+      \typeout{F}%
+      \ifx\tempempty\tempa% Arg 1 is empty
+	\typeout{G}%
+      \else
+	\typeout{H}%
+	\setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{} }
+      \fi
+      \typeout{Q}%
+      \MTr@setlabel #2\END
+    \fi%
   \fi%
+  \typeout{I}%
 }
 %    \end{macrocode}
 % \end{macro}
