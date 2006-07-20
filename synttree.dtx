@@ -579,9 +579,8 @@
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{%
   \ifx:#2%
-    \setbox\MTr@labelbox\hbox{}%
   {}G{}%
-    \MTr@setlabel #1 \END%
+    \setbox\MTr@labelbox\hbox{\ignorespaces#1\unskip}%
   {}H{}%
   \else
     \ifx#2b\MTr@bottomnodetrue\else%
@@ -591,49 +590,6 @@
     \fi\fi\fi%
     \MTr@parsedot#3\END
   \fi
-}
-%    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\Mtr@setlabel}
-% Store the tree's label in a box. This convoluted macro is needed to strip
-% spaces off of the beginning and and of a label. Suggestions for
-% improvement are welcome!
-%    \begin{macrocode}
-\def\MTr@setlabel #1 #2\END{%
-  \typeout{Number 2: <#2>}
-  \typeout{Number 1: <#1>}
-  \typeout{----------------}
-  \relax
-  %\MTr@setlabelblockone{#1}
-  \def\tempempty{}
-  \def\tempspace{ }
-  \def\tempa{#1}
-  \def\tempb{#2}
-  \ifx\tempempty\tempa\relax% Arg 1 is empty
-    \typeout{A}%
-  \else
-    \typeout{B}%
-    \setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox #1}%
-  \fi%
-  \typeout{C}%
-  \ifx\tempempty\tempb% Arg 2 is empty
-    \typeout{D}%
-  \else
-    \ifx\tempspace\tempb% Arg 2 is a space
-      \typeout{E}%
-    \else
-      \typeout{F}%
-      \ifx\tempempty\tempa% Arg 1 is empty
-	\typeout{G}%
-      \else
-	\typeout{H}%
-	\setbox\MTr@labelbox\hbox{\unhbox\MTr@labelbox{} }
-      \fi
-      \typeout{Q}%
-      \MTr@setlabel #2\END
-    \fi%
-  \fi%
-  \typeout{I}%
 }
 %    \end{macrocode}
 % \end{macro}
