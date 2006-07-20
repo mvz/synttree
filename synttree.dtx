@@ -1,8 +1,8 @@
-%% \CheckSum{774}
+%% \CheckSum{747}
 % \iffalse meta-comment
 %% synttree.dtx 
 %% Package `synttree' for use with LaTeX 2e
-%% Version 1.4
+%% Version 1.4.1
 % 
 % See the section "Author and License" below for copyright and licensing
 % information 
@@ -40,6 +40,8 @@
 %	    2005/04/13	Allow up to 10 children (or any number, in theory).
 % 1.4	    2005/05/01	Allow any number of children, just warn.
 %			Updated documentation.
+% 1.4.1	    2006/07/20	Remove spurious spaces in output.
+%			Simplify label typesetting.
 %
 %<*driver>
 \documentclass[a4paper]{ltxdoc}
@@ -60,7 +62,7 @@
 %\fi
 %\MakeShortVerb{\"} 
 % \title{The "synttree" package for typesetting syntactic
-% trees.\footnote{Package version 1.4}}
+% trees.\footnote{Package version 1.4.1}}
 % \author{Matijs van Zuijlen\footnote{e-mail: \texttt{mvz@xs4all}; web:
 % \texttt{http://www.matijs.net/}}}
 %
@@ -87,7 +89,9 @@
 %  complex set of options: "synttree" is designed to do one thing, and do
 %  it well.
 %
-%  The current version adds support for an unlimited number of branches.
+%  Using "synttree", you can create trees of any depth, and an unlimited
+%  number of branches (up to the memory limit of your version of \TeX, of
+%  course). 
 %
 %  \section{Usage}
 %
@@ -95,8 +99,8 @@
 %
 % The current implementation can use either em\TeX{} "\special"'s or
 % \LaTeXe{}'s "\qbezier" macro to draw the lines in the tree,
-% although the latter option is probably not very nice. The behavior
-% defaults to the \LaTeXe{} version.
+% although the latter option is probably technically not very nice. Still,
+% the behavior defaults to the \LaTeXe{} version.
 %
 %  In order to switch between the two modes, the following options are
 %  supported:
@@ -228,7 +232,7 @@
 %
 %  \section{Author and License}
 %
-% Copyright (c) 1998, 1999, 2001, 2004, 2005 Matijs van Zuijlen.
+% Copyright (c) 1998, 1999, 2001, 2004--2006 Matijs van Zuijlen.
 %
 % The "synttree" package is free software. It has been released under the
 % terms of the Latex Project Public License, version 1.3a. 
@@ -258,16 +262,11 @@
 %
 % \subsection{Utility macros}
 %
-% Very useful for putting stuff after a "\fi" (as the name implies).
+% Very useful for putting stuff after a "\fi" (as the name implies)
 % \cite{BasicControl}.
 %    \begin{macrocode}
 \def\@AfterFi#1\fi{\fi#1}
 \def\@AfterElseFi#1\else#2\fi{\fi#1}
-%    \end{macrocode}
-%
-% String comparison\cite{TexByTopic}.
-%    \begin{macrocode}
-\def\ifEqString#1#2{\def\tempa{#1}\def\tempb{#2}\ifx\tempa\tempb\relax}
 %    \end{macrocode}
 %
 % \subsection{Drawing commands}
@@ -567,7 +566,7 @@
 % \end{macro}
 % \begin{macro}{\Mtr@parsedot}
 % Parse the optional node argument.
-%^^ATODO: Maybe this can be done simpler by using "\futurelet" in some way.
+%^^A TODO: Maybe this can be done simpler by using "\futurelet" in some way.
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{%
   \ifx:#2%

@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{synttree}
+\usepackage{stmaryrd}
 \begin{document}
 \childattachsep{0.6in} 
 \childsidesep{0.9em}
@@ -46,27 +47,18 @@ paragraph.
 
 \newpage
 
-\section{Boxes and size}
-    Start\fbox{1\synttree[A]2}End
+\section{Trees within other structures.}
 
-    $\left\{\fbox{\synttree [A]}\right\}$
+Sometimes, trees can show up inside paragraphs (o, really?) or mathematical
+formulas:
 
-    Start\mbox{a\synttree[A[ A    ]]b}End
+    Start\mbox{\synttree[A[ A ]]}End
+    \hfill{Bottom lines up. May not be what we really want.}
 
-    Start\mbox{\synttree[ A [ AA ]]}End
+  Inside \synttree [A[a][paragraph]].
+  \hfill With downward-extending letters. Looks bad.
 
-\section{Two}
+$\left\llbracket\mbox{\synttree [A[B[E[F]][C]][D[Z]]]}\right\rrbracket$
+    \hfill Big semantic brackets.
 
-Special cases.
-
-a\synttree{4} [A[B[E[F]][C]][D[.b Z]]]b
-
-\mbox{a\synttree{4} [A[B[E[F]][C]][D[.b Z]]]b}
-    \hfill In an Mbox.
-
-$\left\{1+\mbox{\synttree{4} [A[B[E[F]][C]][D[.b Z]]]}-2\right\}$
-    \hfill Big brackets.
-
-$\left\{1+\fbox{\synttree [A[B[E[F]][C]][D[Z]]]}-2\right\}$
-    \hfill Big brackets.
 \end{document}
