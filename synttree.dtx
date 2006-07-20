@@ -362,20 +362,20 @@
 % "branchmult" indicates how many levels below the parent the child should
 % be typeset.
 %    \begin{macrocode}
-\def\MTr@makechildcounter#1{
+\def\MTr@makechildcounter#1{%
     \expandafter\newcount\csname MTr@child#1\endcsname%
 }
-\def\MTr@makechildstoreage#1{
+\def\MTr@makechildstoreage#1{%
     \expandafter\newsavebox\csname MTr@child#1box\endcsname%
-    \MTr@makechildcounter{#1x}
-    \MTr@makechildcounter{#1y}
-    \MTr@makechildcounter{#1v}
-    \MTr@makechildcounter{#1w}
-    \MTr@makechildcounter{#1height}
-    \MTr@makechildcounter{#1depth}
-    \MTr@makechildcounter{#1branchmult}
-    \MTr@makechildcounter{#1picheight}
-    \MTr@makechildcounter{#1triangle}
+    \MTr@makechildcounter{#1x}%
+    \MTr@makechildcounter{#1y}%
+    \MTr@makechildcounter{#1v}%
+    \MTr@makechildcounter{#1w}%
+    \MTr@makechildcounter{#1height}%
+    \MTr@makechildcounter{#1depth}%
+    \MTr@makechildcounter{#1branchmult}%
+    \MTr@makechildcounter{#1picheight}%
+    \MTr@makechildcounter{#1triangle}%
 }
 %    \end{macrocode}
 % 
@@ -513,7 +513,6 @@
   \MTr@level=0%
   \MTr@numchildren=0%
   \MTr@uselabelfalse%
-  {}a{}%
   \MTr@parserightbracket%
 }
 %    \end{macrocode}
@@ -531,16 +530,11 @@
 % "]".
 %    \begin{macrocode}
 \def\MTr@parserightbracket#1]{%
-  {}l{}%
   \MTr@parseleftbracket#1[:\END%
-  {}p{}%
   \advance\MTr@level by -1%
-  {}m{}%
   \MTr@dorightbracket%
-  {}n{}%
   \ifnum\MTr@level=0%
-    \typeout{Width: \the\MTr@treew \the\MTr@treev}%
-    \unhbox\MTr@childibox{}z%
+    \unhbox\MTr@childibox{}%
   \else
     \@AfterFi{\MTr@parserightbracket}%
   \fi%
@@ -560,9 +554,7 @@
   \ifMTr@uselabel%
     \MTr@bottomnodefalse%
     \MTr@mytrianglefalse%
-    {}E{}%
     \MTr@parsedot#1.: \END%
-    {}F{}%
   \fi%
   \ifx:#2%
   \else%
@@ -579,9 +571,7 @@
 %    \begin{macrocode}
 \def\MTr@parsedot#1.#2 #3\END{%
   \ifx:#2%
-  {}G{}%
     \setbox\MTr@labelbox\hbox{\ignorespaces#1\unskip}%
-  {}H{}%
   \else
     \ifx#2b\MTr@bottomnodetrue\else%
     \ifx#2x\MTr@bottomnodetrue\MTr@mytriangletrue\else%
@@ -619,13 +609,10 @@
 % ^^A TODO: Put this back into parserightbracket.
 %    \begin{macrocode}
 \def\MTr@dorightbracket{%
-  {}A{}%
   \MTr@maketreebox%
-  {}B{}%
   \egroup%
   \MTr@uselabelfalse%
   \MTr@savecurrentchildbox%
-  {}C{}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -928,11 +915,10 @@
 % picture, its baseline aligned with the bottom of the picture.
 %    \begin{macrocode}
     \advance\MTr@picheight\MTr@treedepth%
-    \typeout{Starting label picture: \the\MTr@picwidth, \the\MTr@picheight}%
     \begin{picture}%
         (\MTr@picwidth,\MTr@picheight)%
         (-\MTr@treev,-\MTr@picheight)%
-      \put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+      %\put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \put(-\MTr@treev,0){%
         \makebox(0,0)[tl]{%
           \rule{0pt}{\MTr@minheight}%
@@ -988,9 +974,8 @@
 % Start the picture and draw the label. Next, draw each child, and the line
 % to that child. Then, end the picture.
 %    \begin{macrocode}
-  \typeout{Starting picture: \the\MTr@picwidth, \the\MTr@picheight}%
   \begin{picture}(\MTr@picwidth,\MTr@picheight)(0,-\MTr@picheight)%
-    \put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
+    %\put(0,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
     \MTr@drawlabel%
     \MTr@loopcnta #1
     \loop
