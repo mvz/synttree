@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{synttree}
 \usepackage{stmaryrd}
+\usepackage{pbox}
 \begin{document}
 \childattachsep{0.6in} 
 \childsidesep{0.9em}
@@ -58,7 +59,22 @@ formulas:
   Inside \synttree [A[a][paragraph]].
   \hfill With downward-extending letters. Looks bad.
 
-$\left\llbracket\mbox{\synttree [A[B[E[F]][C]][D[Z]]]}\right\rrbracket$
+\newbox\mcbox
+\newcommand\mathcenter[1]{%
+  \setbox\mcbox=\hbox{#1}%
+  \parbox{\wd\mcbox}{\unhbox\mcbox}}
+
+  $\left\llbracket\mathcenter{\synttree [A[B[E[F]][C]][D[Z]]]}\right\rrbracket$
     \hfill Big semantic brackets.
+
+  $\left\llbracket 1+ \mathcenter{\synttree [A[B][C]]} - 3 \right\rrbracket$
+
+\section{Faking maximum depth}
+
+\synttree{4}[A [B [.b C]] [C [D[E[F]]]]]
+
+\section{Special labels}
+
+    \synttree[A[.t $\sum_0^5(25)$ ]] \hfill Equation
 
 \end{document}
