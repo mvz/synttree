@@ -1,4 +1,4 @@
-%% \CheckSum{747}
+%% \CheckSum{753}
 % \iffalse meta-comment
 %% synttree.dtx 
 %% Package `synttree' for use with LaTeX 2e
@@ -830,6 +830,17 @@
   \advance\MTr@tempcnta\MTr@lineoffset%
   \expandafter
   \ifnum\csname MTr@child#1triangle\endcsname=1%
+    \MTr@drawchildlinetriangle{#1}%
+  \else%
+    \MTr@drawchildlineline{#1}%
+  \fi%
+}
+\def\MTr@drawchildlineline#1{%
+    \put(0,0){\MTr@drawline%
+      (\MTr@treev,\MTr@parenty)%
+      (\MTr@childparam{#1}{x},\MTr@tempcnta)}%
+}
+\def\MTr@drawchildlinetriangle#1{%
     \MTr@tempcntb\MTr@childparam{#1}{x}%
     \MTr@tempcntc\MTr@tempcntb%
     \advance\MTr@tempcntb \MTr@childparam{#1}{w}%
@@ -843,11 +854,6 @@
     \put(0,0){\MTr@drawline%
         (\MTr@tempcntc,\MTr@tempcnta)%
         (\MTr@tempcntb,\MTr@tempcnta)}%
-  \else%
-    \put(0,0){\MTr@drawline%
-      (\MTr@treev,\MTr@parenty)%
-      (\MTr@childparam{#1}{x},\MTr@tempcnta)}%
-  \fi%
 }
 %    \end{macrocode}
 % \end{macro}
