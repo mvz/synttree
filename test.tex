@@ -2,6 +2,18 @@
 \usepackage{synttree}
 \usepackage{stmaryrd}
 \usepackage{pbox}
+
+\makeatletter
+\newbox\MTr@alignbox
+\newcommand\aligncenter[1]{%
+  \setbox\MTr@alignbox=\hbox{#1}%
+  \parbox{\wd\MTr@alignbox}{\unhbox\MTr@alignbox}}
+\newcommand\aligntop[1]{%
+  \setbox\MTr@alignbox=\hbox{#1}%
+  \MTr@templength 1sp%
+  \raisebox{-\the\MTr@treedepth\MTr@templength}{\unhbox\MTr@alignbox}}
+\makeatother
+
 \begin{document}
 \childattachsep{0.6in} 
 \childsidesep{0.9em}
@@ -59,15 +71,10 @@ formulas:
   Inside \synttree [A[a][paragraph]].
   \hfill With downward-extending letters. Looks bad.
 
-\newbox\mcbox
-\newcommand\mathcenter[1]{%
-  \setbox\mcbox=\hbox{#1}%
-  \parbox{\wd\mcbox}{\unhbox\mcbox}}
-
-  $\left\llbracket\mathcenter{\synttree [A[B[E[F]][C]][D[Z]]]}\right\rrbracket$
+  $\left\llbracket\aligncenter{\synttree [A[B[E[F]][C]][D[Z]]]}\right\rrbracket$
     \hfill Big semantic brackets.
 
-  $\left\llbracket 1+ \mathcenter{\synttree [A[B][C]]} - 3 \right\rrbracket$
+  $\left\llbracket 1+ \aligncenter{\synttree [A[B][C]]} - 3 \right\rrbracket$
 
 \section{Faking maximum depth}
 
@@ -76,5 +83,21 @@ formulas:
 \section{Special labels}
 
     \synttree[A[.t $\sum_0^5(25)$ ]] \hfill Equation
+
+\section{Alignment}
+Default is alignment at the bottom. Alignment at the center can go like
+this:
+
+Here is a paragraph with \aligncenter{\synttree[an [embedded] [tree]]}\ in
+it. Let's make this paragraph a little longer to demonstrate what happens
+with word wrapping.
+
+Here is a paragraph with \aligntop{\synttree[an [embedded] [tree]]}\ in it,
+top aligned. Let's make this paragraph a little longer to demonstrate what
+happens with word wrapping.
+
+Here is a paragraph with \synttree[an [embedded] [goody]] in
+it, bottom aligned. Let's make this paragraph a little longer to
+demonstrate what happens with word wrapping.
 
 \end{document}
