@@ -5,6 +5,9 @@
 *.toc
 *.glo
 *.idx
+*.gls
+*.ilg
+*.ind
 synttree.sty
 synttree.tar.gz
 .*.swp

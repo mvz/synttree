@@ -9,11 +9,11 @@ test: 	test.dvi
 package: synttree.tar.gz
 
 clean:
-	rm -f *.aux *.log *.dvi *.toc *.sty *.glo *.idx *.ilg *.ind
+	rm -f *.aux *.log *.dvi *.toc *.sty *.glo *.idx *.ilg *.ind *.gls
 	rm -f *.pdf
 	rm -f synttree.tar.gz
 
-doc: 	synttree.dvi
+doc: 	synttree.pdf
 
 demos:	simple.dvi balance.dvi tree.dvi
 
@@ -25,10 +25,22 @@ synttree.sty: synttree.ins synttree.dtx
 	rm -f $@
 	tex $<
 
-test.dvi: test.tex synttree.sty
+test.pdf: test.tex synttree.sty
 	latex $<
 
-synttree.dvi: synttree.dtx synttree.sty
+synttree.glo: synttree.dtx synttree.sty
+	latex $<
+
+synttree.idx: synttree.dtx synttree.sty
+	latex $<
+
+synttree.gls: synttree.glo
+	makeindex -s gglo.ist -o synttree.gls synttree.glo
+
+synttree.ind: synttree.idx
+	makeindex -s gind.ist -o synttree.ind synttree.idx
+
+synttree.dvi: synttree.dtx synttree.sty synttree.ind synttree.gls
 	latex $<
 	latex $<
 
