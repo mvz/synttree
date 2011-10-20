@@ -1,4 +1,4 @@
-%% \CheckSum{753}
+%% \CheckSum{747}
 % \iffalse meta-comment
 %% synttree.dtx 
 %% Package `synttree' for use with LaTeX 2e
@@ -896,7 +896,8 @@
     \global\setbox\MTr@treebox\hbox{\MTr@outputlabel}%
   \fi%
   \ifnum\MTr@numchildren>0%
-    \global\setbox\MTr@treebox\hbox{\MTr@outputchildren{\the\MTr@numchildren}}%
+    \global\setbox\MTr@treebox\hbox{%
+      \MTr@outputchildren{\the\MTr@numchildren}}%
   \fi%
   \global\MTr@branchmult\MTr@mybranchmult%
   \ifMTr@mytriangle%
@@ -945,7 +946,6 @@
     \begin{picture}%
         (\MTr@picwidth,\MTr@picheight)%
         (-\MTr@treev,-\MTr@picheight)%
-      %\put(-\MTr@treev,-\MTr@picheight){\framebox(\MTr@picwidth,\MTr@picheight){}}%
       \put(-\MTr@treev,0){%
         \makebox(0,0)[tl]{%
           \rule{0pt}{\MTr@minheight}%
